@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Provide Name"],
       trim: true,
+      
     },
     email: {
       type: String,
@@ -38,6 +39,8 @@ const userSchema = new mongoose.Schema(
     },
     last_login_date: {
       type: Date,
+      default:"",
+
     },
     status: {
       type: String,
@@ -46,29 +49,27 @@ const userSchema = new mongoose.Schema(
     },
 
     // ✅ Store address details properly
-    address_details: [
+    address_details:[
       {
-        street: { type: String, trim: true },
-        city: { type: String, trim: true },
-        state: { type: String, trim: true },
-        postalCode: { type: String, trim: true },
-        country: { type: String, trim: true },
-      },
-    ],
+        type: mongoose.Schema.ObjectId,
+        ref:'address'
+    }
+  ] 
+      ,
 
     // ✅ Shopping cart should store product references
     shopping_cart: [
       {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-        quantity: { type: Number, default: 1, min: 1 },
+        type:mongoose.Schema.ObjectId,
+        ref:'cartProduct',
       },
     ],
 
     // ✅ Order history should reference orders
     orderHistory: [
       {
-        orderId: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
-        purchasedAt: { type: Date, default: Date.now },
+        type:mongoose.Schema.ObjectId,
+        ref:'order',
       },
     ],
 
@@ -86,6 +87,7 @@ const userSchema = new mongoose.Schema(
       enum: ["USER", "ADMIN"],
     },
   },
+  
   {
     timestamps: true, //  automatically creates createdAt & updatedAt
   }
