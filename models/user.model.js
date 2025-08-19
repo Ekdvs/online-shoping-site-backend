@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema(
     address_details:[
       {
         type: mongoose.Schema.ObjectId,
-        ref:'address'
+        ref:'Address'
     }
   ] 
       ,
@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema(
     shopping_cart: [
       {
         type:mongoose.Schema.ObjectId,
-        ref:'cartProduct',
+        ref:'CartProduct',
       },
     ],
 
@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema(
     orderHistory: [
       {
         type:mongoose.Schema.ObjectId,
-        ref:'order',
+        ref:'Order',
       },
     ],
 
@@ -93,4 +93,5 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("User", userSchema);
+const UserModel=mongoose.model("User", userSchema);
+export default UserModel;
