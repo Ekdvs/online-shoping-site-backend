@@ -1,6 +1,7 @@
-import { response } from "express";
+
 import UserModel from "../models/user.model.js";
 import bcrypt from 'bcrypt'
+import { sendWelcomeMail } from "../emails/sendMail.js";
 
 //register user
 export const registerUsers=async(request,response)=>{
@@ -34,6 +35,7 @@ export const registerUsers=async(request,response)=>{
 
        // register user into database
         const newUser = await new UserModel(payload).save();
+        await sendWelcomeMail(newUser)
          return response.status(201).json({
             message:' User registered Successfully',
             data:newUser,
