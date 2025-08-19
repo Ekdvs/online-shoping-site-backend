@@ -1,4 +1,7 @@
 import transporter from "./mailer.js";
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 export const sendWelcomeMail = async (user) => {
   try {
