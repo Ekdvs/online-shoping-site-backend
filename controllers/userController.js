@@ -235,5 +235,59 @@ export const updateUsers=async(request,responce)=>{
                 success:false
             });
     }
+} 
+
+// delete user account
+
+export const deleteUser=async(request,responce)=>{
+    try {
+        const userId=request.userId;
+        
+
+        //check user
+        if(!userId){
+            return responce.status(401).json({
+            message:"Unauthorized",
+            error:true,
+            success:false,
+        })
+        }
+
+        //delete user from the database
+        const deleteduser=await UserModel.findByIdAndDelete(userId);
+
+        if(!deleteduser){
+            return res.status(404).json({
+        message: "User not found",
+        error: true,
+        success: false,
+        });
+        }
+
+        //clear authentication cookies
+        const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
+
+     return res.status(200).json({
+      message: "User account deleted successfully",
+      data: deleteduser, 
+      error: false,
+      success: true,
+    });
+        
+    } catch (error) {
+        return responce.status(500).json({
+                message:'Something went wrong during logout',
+                error:true,
+                success:false
+            });
+        
+    }
 }
 
