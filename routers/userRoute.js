@@ -1,7 +1,7 @@
 import express from 'express'
 const userRouter = express.Router(); 
 
-import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser, forgotPassword } from '../controllers/userController.js';
+import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser, forgotPassword, verifyEmail } from '../controllers/userController.js';
 import auth from '../middleweare/auth.js';
 
 //registeruser
@@ -21,6 +21,9 @@ userRouter.delete('/delete',auth,deleteUser);
 
 //send otp for forgotten password
 userRouter.post('/sendotp',forgotPassword);
+
+//verfiy user email 
+userRouter.post('/verify-email',verifyEmail)
 
 
 export  default userRouter;
