@@ -2,6 +2,8 @@
 import { sendWelcomeEmail } from "../emails/sendMail.js";
 import UserModel from "../models/user.model.js";
 import bcrypt from 'bcrypt'
+import generatedAccesToken from "../util/generatedAccessToken.js";
+import generatedRefreshToken from "../util/generatedRefreshToken.js";
 
 
 
@@ -96,15 +98,33 @@ export const loginUsers =async(request,responce)=>{
                 success:false
             });
         }
+        // acess and refesh token
+        const accessToken =await generatedAccesToken(user._id);
+        const refeshToken =await generatedRefreshToken(user._id);
 
          // Update last login
         const updateUser=await UserModel.findByIdAndUpdate(user._id,{
             last_login_date:new Date()
         },{new:true})
+
+        //add cookies
+        const cookieOptions={
+            httpOnly:true,
+            secure:true,
+            sameSite:'None',
+
+        }
+         
+        //add to token to cokies
+        responce.cookie("accesToken",accessToken,cookieOptions);
+        responce.cookie("refreshToken",refeshToken,cookieOptions);
         
         return responce.status(201).json({
                 message:'User Logged in Successfully',
-                data:updateUser,
+                data:{updateUser,
+                    accessToken,
+                    refeshToken,
+                },
                 error:false,
                 success:true
             });

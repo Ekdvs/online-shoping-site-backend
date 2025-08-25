@@ -2,11 +2,12 @@ import express from 'express'
 import connectDB from "./configs/db.js";
 import dotenv from "dotenv";
 import userRouter from './routers/userRoute.js';
-
+import cookieParser from "cookie-parser";
 
 
 const app= express();
 dotenv.config();
+app.use(cookieParser());
 
 // Middleware
 app.use(express.json()); // Middleware to parse JSON bodies
