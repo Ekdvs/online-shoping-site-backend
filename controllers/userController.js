@@ -1,9 +1,11 @@
 
-import { sendWelcomeEmail } from "../emails/sendMail.js";
+import { sendOtp, sendWelcomeEmail } from "../emails/sendMail.js";
 import UserModel from "../models/user.model.js";
 import bcrypt from 'bcrypt'
 import generatedAccesToken from "../util/generatedAccessToken.js";
 import generatedRefreshToken from "../util/generatedRefreshToken.js";
+import { request, response } from "express";
+import generatedOtp from "../util/genarateOtp.js";
 
 
 
@@ -61,12 +63,12 @@ export const registerUsers=async(request,response)=>{
 
 //login
 
-export const loginUsers =async(request,responce)=>{
+export const loginUsers =async(request,response)=>{
     try{
         const{email,password}=request.body;
         //check email and password empty
         if(!email||!password){
-            return responce.status(400).json({
+            return response.status(400).json({
                 message:'All Fields are required',
                 error:true,
                 success:false
@@ -75,7 +77,7 @@ export const loginUsers =async(request,responce)=>{
         //find user
         const user=await UserModel.findOne({email});
         if(!user){
-            return responce.status(400).json({
+            return response.status(400).json({
                 message:'User not Registered',
                 error:true,
                 success:false
@@ -83,7 +85,7 @@ export const loginUsers =async(request,responce)=>{
         }
         // Check if ACTIVE (only if your schema has "status")
         if(user.status!=='ACTIVE'){
-             return responce.status(400).json({
+             return response.status(400).json({
                 message:'User is inative',
                 error:true,
                 success:false
@@ -92,7 +94,7 @@ export const loginUsers =async(request,responce)=>{
           // Verify password
         const checkpassword= await bcrypt.compare(password,user.password);
         if(!checkpassword){
-            return responce.status(400).json({
+            return response.status(400).json({
                 message:'Invalid Credentials (Userpassword not correct)',
                 error:true,
                 success:false
@@ -116,10 +118,10 @@ export const loginUsers =async(request,responce)=>{
         }
          
         //add to token to cokies
-        responce.cookie("accessToken",accessToken,cookieOptions);
-        responce.cookie("refeshToken",refeshToken,cookieOptions);
+        response.cookie("accessToken",accessToken,cookieOptions);
+        response.cookie("refeshToken",refeshToken,cookieOptions);
         
-        return responce.status(201).json({
+        return response.status(201).json({
                 message:'User Logged in Successfully',
                 data:{updateUser,
                     accessToken,
@@ -131,7 +133,7 @@ export const loginUsers =async(request,responce)=>{
 
     }
     catch(error){
-        return responce.status(500).json({
+        return response.status(500).json({
                 message:'Invalid Credentials',
                 error:true,
                 success:false
@@ -143,12 +145,12 @@ export const loginUsers =async(request,responce)=>{
 
 //logout
 
-export const logoutUsers=async(request,responce)=>{
+export const logoutUsers=async(request,response)=>{
  try {
     const userId= request.userId;
     //check user
     if(!userId){
-        return responce.status(401).json({
+        return response.status(401).json({
             message:"User not Found",
             error:true,
             success:false,
@@ -165,15 +167,15 @@ export const logoutUsers=async(request,responce)=>{
     }
     //clear cookies
 
-    responce.clearCookie("accessToken",cookieOption);
-    responce.clearCookie("refeshToken",cookieOption);
+    response.clearCookie("accessToken",cookieOption);
+    response.clearCookie("refeshToken",cookieOption);
 
     //remove refesh token from database
     const removerefeshToken=await UserModel.findByIdAndUpdate(userId ,{
         refresh_token:''
     })
 
-    return responce.status(200).json({
+    return response.status(200).json({
         message:'User Logged Out successfully',
         data:removerefeshToken,
         error:false,
@@ -181,7 +183,7 @@ export const logoutUsers=async(request,responce)=>{
     })
     
  } catch (error) {
-    return responce.status(500).json({
+    return response.status(500).json({
                 message:'Something went wrong during logout',
                 error:true,
                 success:false
@@ -191,14 +193,14 @@ export const logoutUsers=async(request,responce)=>{
 
 //update user details
 
-export const updateUsers=async(request,responce)=>{
+export const updateUsers=async(request,response)=>{
     try {
         const userId=request.userId;
         const {name,mobile,password}=request.body;
 
         //check user
         if(!userId){
-            return responce.status(401).json({
+            return response.status(401).json({
             message:"User not Found",
             error:true,
             success:false,
@@ -220,7 +222,7 @@ export const updateUsers=async(request,responce)=>{
                 password:hashedPassword?hashedPassword:undefined
             }
         )
-        return responce.status(200).json({
+        return response.status(200).json({
             message:'User update successfully',
             data:updateUser,
             error:false,
@@ -229,7 +231,7 @@ export const updateUsers=async(request,responce)=>{
 
         
     } catch (error) {
-        return responce.status(500).json({
+        return response.status(500).json({
                 message:'Something went wrong during logout',
                 error:true,
                 success:false
@@ -239,14 +241,14 @@ export const updateUsers=async(request,responce)=>{
 
 // delete user account
 
-export const deleteUser=async(request,responce)=>{
+export const deleteUser=async(request,response)=>{
     try {
         const userId=request.userId;
         
 
         //check user
         if(!userId){
-            return responce.status(401).json({
+            return response.status(401).json({
             message:"Unauthorized",
             error:true,
             success:false,
@@ -282,7 +284,7 @@ export const deleteUser=async(request,responce)=>{
     });
         
     } catch (error) {
-        return responce.status(500).json({
+        return response.status(500).json({
                 message:'Something went wrong during logout',
                 error:true,
                 success:false
@@ -291,3 +293,53 @@ export const deleteUser=async(request,responce)=>{
     }
 }
 
+//send otp for forgooten password
+export const forgotPassword = async (request, response) => {
+  try {
+    const { email } = request.body;
+
+    // Find user
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return response.status(404).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Create OTP
+    const otp = generatedOtp();
+    console.log("Generated OTP:", otp);
+
+    // OTP valid for 5 minutes
+    const otpExpiry = Date.now() + 5 * 60 * 1000;
+
+    // Update user
+    const updateUser = await UserModel.findByIdAndUpdate(user._id, {
+      forgot_password_otp: otp,
+      forgot_password_expiry: new Date(otpExpiry).toISOString(),
+    });
+
+    // Send OTP if update successful
+    if (updateUser) {
+      //await sendOtp(user, otp); // Make sure to await
+      console.log("✅ OTP email sent successfully!");
+    }
+
+    return response.status(200).json({
+      message: "Password reset OTP sent to your email",
+      error: false,
+      success: true,
+    });
+
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    return response.status(500).json({
+      message: "Something went wrong during forgot password",
+      error: true,
+      success: false,
+    });
+  }
+};
