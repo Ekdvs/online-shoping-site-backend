@@ -6,6 +6,7 @@ import generatedAccesToken from "../util/generatedAccessToken.js";
 import generatedRefreshToken from "../util/generatedRefreshToken.js";
 import { request, response } from "express";
 import generatedOtp from "../util/genarateOtp.js";
+import uploadImageCloudinary from "../util/uploadImageCloudinary.js";
 
 
 
@@ -410,3 +411,58 @@ export const verifyEmail = async (request, response) => {
     });
   }
 };
+
+//uploading avater
+export const uploadAvatar = async (request, response) => {
+  try {
+    // Get user ID
+    const userId = request.userId;
+    if (!userId) {
+      return response.status(401).json({
+        message: "Unauthorized",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Get image from multer
+    const image = request.file;
+    if (!image) {
+      return response.status(400).json({
+        message: "No image uploaded",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Upload to Cloudinary
+    const upload = await uploadImageCloudinary(image);
+
+    // Update user avatar
+    await UserModel.findByIdAndUpdate(userId, {
+      avatar: upload.secure_url,
+    });
+
+    return response.status(200).json({
+      message: "Profile picture uploaded successfully",
+      success: true,
+      error: false,
+      data: {
+        _id: userId,
+        avatar: upload.secure_url,
+      },
+    });
+  } catch (error) {
+    console.error("Upload Avatar Error:", error);
+    return response.status(500).json({
+      message: "Internal Server Error",
+      error: true,
+      success: false,
+    });
+  }
+};
+
+//otp verfiy
+export const verifyForgotPasswordOtp= async (request,response)=>{
+
+}
