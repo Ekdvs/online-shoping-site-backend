@@ -3,6 +3,7 @@ import connectDB from "./configs/db.js";
 import dotenv from "dotenv";
 import userRouter from './routers/userRoute.js';
 import cookieParser from "cookie-parser";
+import categoryRouter from './routers/categoryRoute.js';
 
 
 const app= express();
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true })); //
 
 //Routes
 app.use("/api/user",userRouter);
+app.use('/api/category',categoryRouter)
 
 const Port=process.env.PORT||5000;
 
