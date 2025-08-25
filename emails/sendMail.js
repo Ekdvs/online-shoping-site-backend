@@ -2,13 +2,13 @@ import transporter from "../mailer.js";
 import { otpEmailTemplate, welcomeEmailTemplate } from "./mails.js";
 
 
-export const sendWelcomeEmail = async (user) => {
+export const sendWelcomeEmail = async (user,verifyurl) => {
   try {
     await  transporter.sendMail({
       from: `"Online Shopping" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Welcome to My App 🎉",
-      html: welcomeEmailTemplate(user), // 🔥 Import template
+      html: welcomeEmailTemplate(user,verifyurl), // 🔥 Import template
     });
     console.log("✅ Welcome email sent successfully!");
   } catch (err) {

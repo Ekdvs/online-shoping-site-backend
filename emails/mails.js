@@ -1,5 +1,5 @@
 //send welcome message
-export const welcomeEmailTemplate = (user) => {
+export const welcomeEmailTemplate = (user,url) => {
   return `
     <!DOCTYPE html>
         <html lang="en">
@@ -32,7 +32,7 @@ export const welcomeEmailTemplate = (user) => {
               <h1>Hello, ${user.name}!</h1>
               <p>We’re thrilled to have you on board. Your journey with <strong>Your App Name</strong> starts here!</p>
               <p>Get ready to explore all the features and make the most out of your experience.</p>
-              <a href="https://yourapp.com/login" class="button">Get Started</a>
+              <a href="${url}" class="button">verify email</a>
               <p style="margin-top:25px;">If you have any questions, feel free to reply to this email. We’re always here to help.</p>
             </div>
             <div class="footer">

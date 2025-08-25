@@ -39,9 +39,16 @@ export const registerUsers=async(request,response)=>{
         password:hashedPassword
        };
 
-       // register user into database
+       // register user into database save
         const newUser = await new UserModel(payload).save();
-        await sendWelcomeEmail(newUser)
+        
+
+        //send email verify link
+        const verifyurl = `${process.env.FRONTEND_URL}/verify-email?code=${newUser?._id}`;
+
+        //send  emailmessage
+        await sendWelcomeEmail(newUser,verifyurl)
+
          return response.status(201).json({
             message:' User registered Successfully',
             data:newUser,
@@ -52,7 +59,7 @@ export const registerUsers=async(request,response)=>{
     catch(error){
         return response.status(500).json({
             message:'Internal sever error',
-            error:ture,
+            error:true,
             success:false,
         })
 
@@ -92,6 +99,15 @@ export const loginUsers =async(request,response)=>{
             });
         }
           // Verify password
+        
+        if(!user.verify_email){
+            return response.status(400).json({
+                message:'Verfiy email before the login',
+                error:true,
+                success:false
+            });
+        }
+          // Verify email
         const checkpassword= await bcrypt.compare(password,user.password);
         if(!checkpassword){
             return response.status(400).json({
@@ -310,7 +326,7 @@ export const forgotPassword = async (request, response) => {
     }
 
     // Create OTP
-    const otp = generatedOtp();
+    // const otp = generatedOtp();
     console.log("Generated OTP:", otp);
 
     // OTP valid for 5 minutes
@@ -338,6 +354,57 @@ export const forgotPassword = async (request, response) => {
     console.error("Forgot Password Error:", error);
     return response.status(500).json({
       message: "Something went wrong during forgot password",
+      error: true,
+      success: false,
+    });
+  }
+};
+
+//verify email adress
+
+export const verifyEmail = async (request, response) => {
+  try {
+    const { code } = request.body; // or request.query if GET
+    console.log(code);
+
+    if (!code) {
+      return response.status(401).json({
+        message: "Verification code is missing",
+        error: true,
+        success: false,
+      });
+    }
+
+    const user = await UserModel.findById(code);
+    if (!user) {
+      return response.status(401).json({
+        message: "Invalid verification link",
+        error: true,
+        success: false,
+      });
+    }
+//console.log(user.verify_email)
+    if (user.verify_email) {
+      return response.status(200).json({
+        message: "Email already verified",
+        error: false,
+        success: true,
+      });
+    }
+
+    user.verify_email = true;
+    await user.save();
+    //console.log(user.verify_email)
+
+    return response.status(200).json({
+      message: "Email verified successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({
+      message: "Internal server error",
       error: true,
       success: false,
     });
