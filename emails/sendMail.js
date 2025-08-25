@@ -1,24 +1,17 @@
-import transporter from "./mailer.js";
-import dotenv from 'dotenv'
+import transporter from "../mailer.js";
+import { welcomeEmailTemplate } from "./mails.js";
 
-dotenv.config();
 
-export const sendWelcomeMail = async (user) => {
+export const sendWelcomeEmail = async (user) => {
   try {
-    const mailOptions = {
-      from: `"The Todo App" <${process.env.MAIL_USER}>`,
+    await  transporter.sendMail({
+      from: `"My App" <${process.env.EMAIL_USER}>`,
       to: user.email,
-      subject: "Welcome to The Todo App 🎉",
-      html: `
-        <h2>Welcome, ${user.name}!</h2>
-        <p>Thank you for registering with <b>The Todo App</b>. 
-        Start creating and managing your tasks today 🚀</p>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Welcome email sent to ${user.email}`);
-  } catch (error) {
-    console.error("❌ Email sending failed:", error.message);
+      subject: "Welcome to My App 🎉",
+      html: welcomeEmailTemplate(user), // 🔥 Import template
+    });
+    console.log("✅ Welcome email sent successfully!");
+  } catch (err) {
+    console.error("❌ Failed to send email:", err);
   }
 };
