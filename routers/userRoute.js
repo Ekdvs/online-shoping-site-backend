@@ -1,8 +1,9 @@
 import express from 'express'
 const userRouter = express.Router(); 
 
-import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser, forgotPassword, verifyEmail } from '../controllers/userController.js';
+import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser, forgotPassword, verifyEmail, uploadAvatar } from '../controllers/userController.js';
 import auth from '../middleweare/auth.js';
+import upload from '../middleweare/multer.js';
 
 //registeruser
 userRouter.post('/register',registerUsers);
@@ -24,6 +25,9 @@ userRouter.post('/sendotp',forgotPassword);
 
 //verfiy user email 
 userRouter.post('/verify-email',verifyEmail)
+
+//uploade profile picture
+userRouter.put('/upload-avatar',auth,upload.single('avatar'), uploadAvatar)
 
 
 export  default userRouter;
