@@ -116,8 +116,8 @@ export const loginUsers =async(request,responce)=>{
         }
          
         //add to token to cokies
-        responce.cookie("accesToken",accessToken,cookieOptions);
-        responce.cookie("refreshToken",refeshToken,cookieOptions);
+        responce.cookie("accessToken",accessToken,cookieOptions);
+        responce.cookie("refeshToken",refeshToken,cookieOptions);
         
         return responce.status(201).json({
                 message:'User Logged in Successfully',
@@ -139,5 +139,53 @@ export const loginUsers =async(request,responce)=>{
 
     }
 
+}
+
+//logout
+
+export const logoutUsers=async(request,responce)=>{
+ try {
+    const userId= request.userId;
+    //check user
+    if(!userId){
+        return responce.status(401).json({
+            message:"User not Found",
+            error:true,
+            success:false,
+        })
+
+    }
+    //cookie setting
+    const cookieOption={
+        httpOnly:true,
+        secure:true,
+        sameSite:'None',
+
+
+    }
+    //clear cookies
+
+    responce.clearCookie("accessToken",cookieOption);
+    responce.clearCookie("refeshToken",cookieOption);
+
+    //remove refesh token from database
+    const removerefeshToken=await UserModel.findByIdAndUpdate(userId ,{
+        refresh_token:''
+    })
+
+    return responce.status(200).json({
+        message:'User Logged Out successfully',
+        data:removerefeshToken,
+        error:false,
+        success:true
+    })
+    
+ } catch (error) {
+    return responce.status(500).json({
+                message:'Something went wrong during logout',
+                error:true,
+                success:false
+            });
+ }
 }
 
