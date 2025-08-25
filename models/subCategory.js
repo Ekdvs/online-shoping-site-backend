@@ -12,7 +12,7 @@ const sub_categorySchema=new mongoose.Schema(
         },
         categoryId:{
             type:[mongoose.Schema.ObjectId],
-            ref:'Catrrgory',
+            ref:'Category',
             required:[true,'Provide Sub category image'],
         },
 
@@ -21,5 +21,5 @@ const sub_categorySchema=new mongoose.Schema(
         timestamps:true,
     }
 )
-
-export default mongoose.model('SubCategory',sub_categorySchema)
+const SubCategory=mongoose.model('SubCategory',sub_categorySchema)
+export default SubCategory;
