@@ -8,7 +8,7 @@ const auth = async (req, res, next) => {
 
     if (!token) {
       return res.status(401).json({
-        message: "11No token provided. Unauthorized",
+        message: "No token provided. Unauthorized",
         error: true,
         success: false,
       });
