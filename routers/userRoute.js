@@ -1,7 +1,7 @@
 import express from 'express'
 const userRouter = express.Router(); 
 
-import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser } from '../controllers/userController.js';
+import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser, forgotPassword } from '../controllers/userController.js';
 import auth from '../middleweare/auth.js';
 
 //registeruser
@@ -17,7 +17,10 @@ userRouter.post('/logout',auth,logoutUsers);
 userRouter.put('/update-user',auth,updateUsers);
 
 //delete user account
-userRouter.delete('/delete',deleteUser);
+userRouter.delete('/delete',auth,deleteUser);
+
+//send otp for forgotten password
+userRouter.post('/sendotp',forgotPassword);
 
 
 export  default userRouter;
