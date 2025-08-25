@@ -465,4 +465,6 @@ export const uploadAvatar = async (request, response) => {
 //otp verfiy
 export const verifyForgotPasswordOtp= async (request,response)=>{
 
+  const {email,otp}
+
 }
