@@ -73,6 +73,7 @@ export const registerUsers=async(request,response)=>{
 
 export const loginUsers =async(request,response)=>{
     try{
+
         const{email,password}=request.body;
         //check email and password empty
         if(!email||!password){
@@ -464,7 +465,184 @@ export const uploadAvatar = async (request, response) => {
 
 //otp verfiy
 export const verifyForgotPasswordOtp= async (request,response)=>{
+  try {
+     
+    //get user and password
+    const {email,otp}=request.body;
 
-  const {email,otp}
+      //check otp and email exist
+    if(!email||!otp){
+      return response.status(400).json({
+        message:'Provide email and otp',
+        error:true,
+        sucess:false,
+      })
+  }
+    //check user
+    const user=await UserModel.findOne({email})
 
+    if(!user){
+      return response.status(400).json({
+        message:'Not found User',
+        error:true,
+        sucess:false,
+      })
+    }
+
+    //check otp expire
+
+    const currentTime=new Date().toISOString();
+    if(user.forgot_password_expiry<currentTime){
+      return response.status(400).json({
+        message:'Otp expaired',
+        error:true,
+        sucess:false,
+      })
+    }
+
+    //check otp
+    if(otp==user.forgot_password_otp){
+      return response.status(400).json({
+        message:'Otp invalid',
+        error:true,
+        sucess:false,
+      })
+    }
+
+    //update database
+    const updateUser=await UserModel.findByIdAndUpdate(user?._id,{
+      forgot_password_expiry:'',
+      forgot_password_otp:''
+    })
+
+    return response.status(200).json({
+      message: "Verify Otp sussesfully ",
+      error: false,
+      success: true,
+    });
+
+    
+  } 
+  catch (error) {
+    return response.status(500).json({
+      message: "Internal Server Error",
+      error: true,
+      success: false,
+    });
+  }
+
+}
+
+//get all users (for Admin)
+export const getAllUsers=async (request,response)=>{
+  try {
+
+    //checkrequester is admin
+    if(request.role!=="ADMIN"){
+      return res.status(403).json({
+        message: "Access denied. Admins only.",
+        error: true,
+        success: false,
+      });
+    }
+
+    const users=await UserModel.find().select('-password');
+    return response.status(200).json({
+      message: "Users fetched successfully",
+      error: false,
+      success: true,
+      data: users,
+    })
+
+    
+  } 
+  catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+//get single user by Email
+export const getUserByEmail=async(request,response)=>{
+  try {
+    //get search email
+    const email=request.body;
+
+    //check email
+    if(!email){
+       return res.status(400).json({
+        message: "Email is required",
+        error: true,
+        success: false,
+      });
+    }
+
+    //check user from data base
+
+    const user=await UserModel.findOne({email}).select('-password') //get without password
+    if(!user){
+      return res.status(404).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: "User fetched successfully",
+      error: false,
+      success: true,
+      data: user,
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: true,
+      success: false,
+    });
+  }
+}
+
+//admin can delete user by user email
+export const adminDeleteUser=async (request,response)=>{
+  try {
+
+    //check user id
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+        error: true,
+        success: false,
+      });
+    }
+
+    //check user  in data base
+    const deletedUser = await UserModel.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "User deleted successfully by admin",
+      data: deletedUser,
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: true,
+      success: false,
+    });
+  }
 }
