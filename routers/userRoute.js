@@ -1,7 +1,7 @@
 import express from 'express'
 const userRouter = express.Router(); 
 
-import { registerUsers,loginUsers, logoutUsers, updateUsers } from '../controllers/userController.js';
+import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser } from '../controllers/userController.js';
 import auth from '../middleweare/auth.js';
 
 //registeruser
@@ -14,7 +14,10 @@ userRouter.post('/login',loginUsers);
 userRouter.post('/logout',auth,logoutUsers);
 
 //update user
-userRouter.put('/update-user',auth,updateUsers)
+userRouter.put('/update-user',auth,updateUsers);
+
+//delete user account
+userRouter.delete('/delete',deleteUser);
 
 
 export  default userRouter;
