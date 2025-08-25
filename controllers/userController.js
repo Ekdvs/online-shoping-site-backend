@@ -189,3 +189,51 @@ export const logoutUsers=async(request,responce)=>{
  }
 }
 
+//update user details
+
+export const updateUsers=async(request,responce)=>{
+    try {
+        const userId=request.userId;
+        const {name,mobile,password}=request.body;
+
+        //check user
+        if(!userId){
+            return responce.status(401).json({
+            message:"User not Found",
+            error:true,
+            success:false,
+        })
+        }
+
+        //password hash
+        let hashedPassword;
+
+        if(password){
+            hashedPassword=await bcrypt.hash(password,16)
+        }
+
+        //update data base
+        const updateUser=await UserModel.updateOne({_id:userId},
+            {
+                name,
+                mobile,
+                password:hashedPassword?hashedPassword:undefined
+            }
+        )
+        return responce.status(200).json({
+            message:'User update successfully',
+            data:updateUser,
+            error:false,
+            success:true,
+        })
+
+        
+    } catch (error) {
+        return responce.status(500).json({
+                message:'Something went wrong during logout',
+                error:true,
+                success:false
+            });
+    }
+}
+
