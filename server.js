@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import userRouter from './routers/userRoute.js';
 import cookieParser from "cookie-parser";
 import categoryRouter from './routers/categoryRoute.js';
+import subCategoryRouter from './routers/subCategoryRoute.js';
 
 
 const app= express();
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true })); //
 //Routes
 app.use("/api/user",userRouter);
 app.use('/api/category',categoryRouter)
+app.use('/api/subCategory',subCategoryRouter)
 
 const Port=process.env.PORT||5000;
 
