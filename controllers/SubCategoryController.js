@@ -101,8 +101,7 @@ export const updateSubCategory = async(request,response)=>{
                 error:false,
                 success:true,
             })
-
-        
+    
     } 
     catch (error) {
         return response.status(500).json({
