@@ -1,7 +1,7 @@
 import express from 'express'
 const userRouter = express.Router(); 
 
-import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser, forgotPassword, verifyEmail, uploadAvatar, getAllUsers, adminDeleteUser } from '../controllers/userController.js';
+import { registerUsers,loginUsers, logoutUsers, updateUsers, deleteUser, forgotPassword, verifyEmail, uploadAvatar, getAllUsers, adminDeleteUser, getUserByEmail } from '../controllers/userController.js';
 import auth from '../middleweare/auth.js';
 import upload from '../middleweare/multer.js';
 import admin from '../middleweare/admin.js';
@@ -34,10 +34,12 @@ userRouter.put('/upload-avatar',auth,upload.single('avatar'), uploadAvatar)
 userRouter.get('/allusers',auth,admin,getAllUsers)
 
 // get user by email
-userRouter.get("/email/:email", auth,admin, getUserByEmail);
+userRouter.get("/email/:email", auth,admin,getUserByEmail);
 
 // Admin deletes any user
-userRouter.delete('/delete/:userId',auth,admin,adminDeleteUser)
+userRouter.delete('/delete/:userId',auth,admin,adminDeleteUser);
+
+
 
 
 export  default userRouter;

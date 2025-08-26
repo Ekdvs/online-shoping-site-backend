@@ -569,7 +569,7 @@ export const getAllUsers=async (request,response)=>{
 export const getUserByEmail=async(request,response)=>{
   try {
     //get search email
-    const email=request.body;
+    const {email}=request.body;
 
     //check email
     if(!email){
