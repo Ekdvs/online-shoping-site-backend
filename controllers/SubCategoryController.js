@@ -1,6 +1,7 @@
 import { request, response } from "express"
 import uploadImageCloudinary from "../util/uploadImageCloudinary.js";
 import SubCategory from "../models/subCategory.js";
+import { v2 as cloudinary } from "cloudinary";
 
 
 //create subcategory
@@ -8,7 +9,7 @@ export const createSubCategory = async(request,response)=>{
     try {
         //get name category id
         const{name,categoryId}=request.body;
-        if(!name||!categoryId||request.file){
+        if(!name||!categoryId||!request.file){
             return response.status(400).json({
                 message:"Name, Image and CategoryId are required",
                 error:true,
@@ -104,6 +105,86 @@ export const updateSubCategory = async(request,response)=>{
     
     } 
     catch (error) {
+        return response.status(500).json({
+            message: "Server error", 
+            error: error.message
+        })
+    }
+}
+
+//get all subcategory
+export const getAllSubCategories = async(request,response)=>{
+    try {
+        const subCategory =await SubCategory.find().populate("categoryId",'name');
+        response.status(200).json({
+            message:"retreview all subcategory",
+            data:subCategory,
+            error:false,
+            sucess:true,
+        })
+    } catch (error) {
+         return response.status(500).json({
+            message: "Server error", 
+            error: error.message
+        })
+    }
+}
+
+// Get SubCategory By NAME
+export const getSubCategoryByName= async(request,response)=>{
+    try {
+        const {name}=request.params;
+
+        //find subcategory by name (use case sensitive)
+        const subCategory = await SubCategory.findOne({ name: { $regex: `^${name}$`, $options: "i" } }).populate("categoryId", "name");
+
+        if(!subCategory){
+            return response.status(400).json({
+                message:'SubCategory not found',
+                error:true,
+                sucess:false
+            })
+        }
+
+        return response.status(200).json({
+            message:'subcategory find',
+            data:subCategory,
+            error:false,
+            success:true,
+
+        })
+        
+    } catch (error) {
+        return response.status(500).json({
+            message: "Server error", 
+            error: error.message
+        })
+    }
+
+}
+
+//delete subcategory
+export const deleteSubCategory=async(request,response)=>{
+    try {
+        //get id usin params
+    const {subcategoryId}=request.params;
+
+    const deleted=await SubCategory.findByIdAndDelete(subcategoryId);
+    
+    if(!deleted){
+        return response.status(400).json({
+            message:'SubCategory not found',
+            error:true,
+            sucess:false
+        })
+    }
+    response.status(200).json({
+        message:'SubCategory deleted',
+        error:true,
+        sucess:false,
+    })
+        
+    } catch (error) {
         return response.status(500).json({
             message: "Server error", 
             error: error.message
