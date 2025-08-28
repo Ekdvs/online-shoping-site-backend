@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import categoryRouter from './routers/categoryRoute.js';
 import subCategoryRouter from './routers/subCategoryRoute.js';
 import productRouter from './routers/productRoutes.js';
+import cartRouter from './routers/cartRoute.js';
 
 
 const app= express();
@@ -21,6 +22,7 @@ app.use("/api/user",userRouter);
 app.use('/api/category',categoryRouter)
 app.use('/api/subCategory',subCategoryRouter)
 app.use('/api/products',productRouter)
+app.use('/api/products',cartRouter)
 
 const Port=process.env.PORT||5000;
 
