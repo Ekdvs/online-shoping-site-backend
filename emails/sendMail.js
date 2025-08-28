@@ -29,3 +29,17 @@ export const sendOtp = async (user,otp) => {
     console.error("❌ Failed to send email:", err);
   }
 };
+
+export const sendPromotional = async (emailList,subject, message) => {
+  try {
+    await  transporter.sendMail({
+      from: `"Online Shopping" <${process.env.EMAIL_USER}>`,
+      to: emailList,
+      subject: subject,
+      html: message, 
+    });
+    console.log("✅ otp email sent successfully!");
+  } catch (err) {
+    console.error("❌ Failed to send email:", err);
+  }
+};

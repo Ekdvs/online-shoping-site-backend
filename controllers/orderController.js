@@ -273,3 +273,24 @@ export const deleteOrder=async(request,response)=>{
         });
     }
 }
+
+//get to selling products
+export const getTopSellingProucts=async(request,response)=>{
+    try {
+    const topProducts = await Order.aggregate([
+      { $unwind: "$product_details" },
+      { $group: { _id: "$product_details.productId", totalSold: { $sum: "$product_details.quantity" } } },
+      { $sort: { totalSold: -1 } },
+      { $limit: 5 }
+    ]);
+
+    response.json({
+      message: "Top selling products",
+      data: topProducts,
+      success: true
+    });
+  } catch (err) {
+    response.status(500).json({ message: "Error fetching analytics", error: err.message });
+  }
+}
+
