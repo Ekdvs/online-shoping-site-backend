@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import UserModel from "../models/user.model";
 
 const auth = async (req, res, next) => {
   try {
@@ -24,7 +25,18 @@ const auth = async (req, res, next) => {
         success: false,
       });
     }
+    // Find user in DB
+    const user = await UserModel.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
 
+    // Attach user to request
+    req.user = user;
     req.userId = decoded.id;
     next();
 
