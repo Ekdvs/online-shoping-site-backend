@@ -32,7 +32,7 @@ export const createProduct=async(request,response)=>{
 
     //upload multiple images to cloudinary
     const uploadedImages = await Promise.all(
-      req.files.map((file) => uploadImageCloudinary(file))
+      request.files.map((file) => uploadImageCloudinary(file))
     );
 
     //get image url
@@ -128,100 +128,132 @@ export const getProductById=async(request,responce)=>{
 }
 
 //update product
-export const updateProduct=async(request,response)=>{
-    try {
-        const{id}=request.params;
-        let updateData={...request.body}
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let updateData = { ...req.body };
 
-        //check id
-        if(!id){
-            return res.status(404).json({ 
-                message: "product id not found" ,
-                error:true,
-                success:false,
-            })
-        }
+    // 🔹 Check if ID is provided
+    if (!id) {
+      return res.status(400).json({
+        message: "Product ID is required",
+        error: true,
+        success: false,
+      });
+    }
 
-        // If new images are uploaded
-    if (request.files && request.files.length > 0) {
+    // 🔹 Find existing product
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    // 🔹 If new images are uploaded
+    if (req.files && req.files.length > 0) {
+      // 🔥 Delete old images from Cloudinary
+      if (product.image && product.image.length > 0) {
+        await Promise.all(
+          product.image.map(async (imgUrl) => {
+            try {
+              const parts = imgUrl.split("/");
+              const fileName = parts[parts.length - 1];
+              const publicId = fileName.split(".")[0];
+              await cloudinary.uploader.destroy(publicId);
+            } catch (err) {
+              console.error("Failed to delete image:", imgUrl, err.message);
+            }
+          })
+        );
+      }
+
+      // 🔥 Upload new images to Cloudinary
       const uploadedImages = await Promise.all(
         req.files.map((file) => uploadImageCloudinary(file))
       );
       updateData.image = uploadedImages.map((img) => img.secure_url);
     }
 
+    // 🔹 Update product
     const updated = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
 
-    if (!updated) {
-      return res.status(404).json({ 
-        message: "Product not found" ,
-        error:true,
-        success:false,
-    });
-    }
-
-    return response.status(200).json({
-        message: "Product updated successfully",
+    return res.status(200).json({
+      message: "Product updated successfully",
       data: updated,
       error: false,
       success: true,
-    })
-
-    } 
-    catch (error) {
-        return response.status(500).json({ 
-             message: "Server error",
-             error: error.message 
-            });
-    }
-}
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
 
 //delete product
-export const deleteproduct=async(request,response)=>{
-    try {
-            const{id}=request.params;
-       
+export const deleteproduct = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-        //check id
-        if(!id){
-            return res.status(404).json({ 
-                message: "product id not found" ,
-                error:true,
-                success:false,
-            })
-        }
-
-        //delete from data base
-
-        const productdeleted=await Product.findByIdAndDelete(id);
-
-        if(!productdeleted){
-             return res.status(404).json({ 
-                message: " can not find product" ,
-                error:true,
-                success:false,
-            })
-        }
-
-        return response.status(200).json({
-            message: "Product deleted successfully",
-            error:false,
-            success:true,
-        })
-
-
-        
-    } catch (error) {
-         return response.status(500).json({ 
-             message: "Server error",
-             error: error.message 
-            });
+    // 🔹 Check if ID is provided
+    if (!id) {
+      return res.status(400).json({
+        message: "Product ID is required",
+        error: true,
+        success: false,
+      });
     }
-}
 
+    // 🔹 Find product
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    // 🔹 Delete all product images from Cloudinary
+    if (product.image && product.image.length > 0) {
+      await Promise.all(
+        product.image.map(async (imgUrl) => {
+          try {
+            // Extract public_id from Cloudinary URL
+            const parts = imgUrl.split("/");
+            const fileName = parts[parts.length - 1];
+            const publicId = fileName.split(".")[0];
+
+            await cloudinary.uploader.destroy(publicId);
+          } catch (err) {
+            console.error("Failed to delete image:", imgUrl, err.message);
+          }
+        })
+      );
+    }
+
+    // 🔹 Delete product from database
+    await Product.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      message: "Product and images deleted successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
 //search product by by name or description
 export const searchProduct=async(request,response)=>{
     try {
@@ -267,7 +299,7 @@ export const searchProduct=async(request,response)=>{
 }
 
 //filter products by category ,price,stock,etc
-export const fillterProducts=async(request,response){
+export const fillterProducts=async(request,response)=>{
     try {
 
         // fiter by results

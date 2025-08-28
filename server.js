@@ -5,6 +5,7 @@ import userRouter from './routers/userRoute.js';
 import cookieParser from "cookie-parser";
 import categoryRouter from './routers/categoryRoute.js';
 import subCategoryRouter from './routers/subCategoryRoute.js';
+import productRouter from './routers/productRoutes.js';
 
 
 const app= express();
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true })); //
 app.use("/api/user",userRouter);
 app.use('/api/category',categoryRouter)
 app.use('/api/subCategory',subCategoryRouter)
+app.use('/api/products',productRouter)
 
 const Port=process.env.PORT||5000;
 
