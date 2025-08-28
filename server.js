@@ -22,7 +22,8 @@ app.use("/api/user",userRouter);
 app.use('/api/category',categoryRouter)
 app.use('/api/subCategory',subCategoryRouter)
 app.use('/api/products',productRouter)
-app.use('/api/products',cartRouter)
+app.use('/api/cart',cartRouter)
+app.use('/api/address',cartRouter)
 
 const Port=process.env.PORT||5000;
 

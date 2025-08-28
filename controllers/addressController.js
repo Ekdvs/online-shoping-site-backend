@@ -9,7 +9,7 @@ export const createAdress=async(request,response)=>{
 
         //check user id
         if (!userId) {
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "User ID is required",
                 error: true,
                 success: false,
@@ -19,7 +19,7 @@ export const createAdress=async(request,response)=>{
         //add address
         const newAddress=await AddressModel.create(Address,userId);
 
-        return res.status(201).json({
+        return response.status(201).json({
             message: "Address created successfully",
             data: newAddress,
             success: true,
@@ -27,7 +27,7 @@ export const createAdress=async(request,response)=>{
 
         
     } catch (error) {
-        return res.status(500).json({
+        return response.status(500).json({
             message: "Something went wrong",
             error: true,
             success: false,
@@ -42,7 +42,7 @@ export const getAddresses=async(request,response)=>{
 
         //check user id
         if (!userId) {
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "User ID is required",
                 error: true,
                 success: false,
@@ -59,7 +59,7 @@ export const getAddresses=async(request,response)=>{
         
     } 
     catch (error) {
-       return res.status(500).json({
+       return response.status(500).json({
             message: "Something went wrong",
             error: true,
             success: false,
@@ -76,7 +76,7 @@ export const getAddressById=async(request,response)=>{
 
         //check user id
         if (!userId) {
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "User ID is required",
                 error: true,
                 success: false,
@@ -89,7 +89,7 @@ export const getAddressById=async(request,response)=>{
         const address=await AddressModel.findById(addressId);
 
         if(!address){
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "Address not found",
                 error: true,
                 success: false,
@@ -123,7 +123,7 @@ export const updateAddress=async(request,response)=>{
 
         //check user id
         if (!userId) {
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "User ID is required",
                 error: true,
                 success: false,
@@ -133,7 +133,7 @@ export const updateAddress=async(request,response)=>{
         const updated=await AddressModel.findByIdAndUpdate(addressId,request.body);
 
         if(!updated){
-             return res.status(400).json({
+             return response.status(400).json({
                 message: "adress update fail",
                 error: true,
                 success: false,
@@ -160,12 +160,12 @@ export const updateAddress=async(request,response)=>{
 //delete adress
 export const deleteAddress=async(request,response)=>{
     try {
-        const userId=request.userId;
+        const {userId}=request.userId;
         const {addressId}=request.params;
 
         //check user id
         if (!userId) {
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "User ID is required",
                 error: true,
                 success: false,
@@ -175,7 +175,7 @@ export const deleteAddress=async(request,response)=>{
         //delete from data base
         const deleted=await AddressModel.findByIdAndDelete(addressId)
         if(!deleted){
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "Address not found",
                 error: true,
                 success: false,
@@ -188,7 +188,7 @@ export const deleteAddress=async(request,response)=>{
                     });
     } 
     catch (error) {
-        return res.status(500).json({
+        return response.status(500).json({
             message: "Something went wrong",
             error: true,
             success: false,
