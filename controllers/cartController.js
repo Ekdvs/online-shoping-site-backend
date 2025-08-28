@@ -1,4 +1,4 @@
-import { response } from "express";
+import { request, response } from "express";
 import CartProduct from "../models/cartProduct.model.js";
 import Product from "../models/product.model.js";
 
@@ -151,4 +151,42 @@ export const updateCartItem=async(request,response)=>{
 }
 
 //delete cart item
+export const deleteCartItem=async(request,response)=>{
+    try {
+        const {userId}=request.userId
+        const {cartItemId}=request.params;
+        
+        
+        //check user login and register
+        if(!userId){
+            return response.status(404).json({
+                message: "Please login",
+                error:true,
+                sucess:false
+            })
+        }
 
+        //delete in data base
+        const deleteCart=await CartProduct.findByIdAndDelete(cartItemId);
+
+        if(!deleteCart){
+             return response.status(404).json({
+                message: "Cart item not found",
+                error:true,
+                sucess:false
+            })
+        }
+
+        return response.status(200).json({
+                message: "Cart item deleted successfully",
+                error:false,
+                sucess:true
+            })
+
+        
+    } catch (error) {
+        return response.status(500).json({ 
+            message: "Server error", 
+            error: error.message });
+    }
+}
