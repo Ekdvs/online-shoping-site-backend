@@ -46,7 +46,15 @@ const productSchema=new mongoose.Schema({
     publish:{
         type:Boolean,
         default:'true'
-    }
+    },
+   averageRating: {
+      type: Number,
+      default: 0,
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
+    },
 
 
 }

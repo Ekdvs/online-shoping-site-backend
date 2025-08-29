@@ -11,7 +11,7 @@ orderRouter.post('/create',auth,createOrder)
 //get user all orders
 orderRouter.get('/getuser',auth,getUsersOrders);
 //get all users from admin
-orderRouter.put('/orders',auth,admin,getAllOrders);
+orderRouter.get('/orders',auth,admin,getAllOrders);
 //get order by orderid
 orderRouter.get('/:orderId',auth,getOrderById);
 //update order status

@@ -82,7 +82,7 @@ export const applyDiscount = async (req, res) => {
     }
 
     // 4️⃣ Calculate Total
-    const subTotal = cartItems.reduce((sum, item) => sum + item.productId.price * item.quentity, 0);
+    const subTotal = cartItems.reduce((sum, item) => sum + item.productId.price * item.quantity, 0);
     const discountAmount = (subTotal * coupon.discountPercent) / 100;
     const total = subTotal - discountAmount;
 

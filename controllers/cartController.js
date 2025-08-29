@@ -35,7 +35,7 @@ export const createCardItem=async(request,response)=>{
         let cartItem=await CartProduct.findById(productId);
 
         if(cartItem){
-            cartItem.quentity+=quantity
+            cartItem.quantity+=quantity
 
         }
         else{
@@ -78,7 +78,8 @@ export const getUserCart=async(request,response)=>{
         }
 
         const cart =await CartProduct.find({userId})
-        .populate("productId","name price, image ,stock");
+        .populate("productId", "name price image stock");
+
 
         if(!cart){
             return response.status(404).json({
@@ -88,7 +89,7 @@ export const getUserCart=async(request,response)=>{
             })
         }
 
-        return response.status(201).josn({
+        return response.status(200).json({
             message: "Cart retrieved successfully",
             data: cart,
             success: true,
@@ -106,7 +107,7 @@ export const getUserCart=async(request,response)=>{
 export const updateCartItem=async(request,response)=>{
     try {
 
-        const {userId}=request.userId
+        const userId=request.userId
         const {cartItemId}=request.params;
         const {quantity}=request.body;
         
@@ -134,7 +135,7 @@ export const updateCartItem=async(request,response)=>{
     });
     }
 
-    return res.status(200).json({
+    return response.status(200).json({
       message: "Cart item updated successfully",
       data: updatedCart,
       success: true,
