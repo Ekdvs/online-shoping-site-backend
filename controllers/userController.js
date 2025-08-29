@@ -442,6 +442,7 @@ export const uploadAvatar = async (request, response) => {
     // Update user avatar
     await UserModel.findByIdAndUpdate(userId, {
       avatar: upload.secure_url,
+      
     });
 
     return response.status(200).json({

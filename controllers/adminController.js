@@ -1,7 +1,4 @@
-// controllers/adminController.js
 
-
-import { request, response } from "express";
 import UserModel from "../models/user.model.js";
 import { sendPromotional } from "../emails/sendMail.js";
 import Order from "../models/order.modal.js";

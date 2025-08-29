@@ -94,6 +94,7 @@ export const updateSubCategory = async(request,response)=>{
             const updated=await SubCategory.findByIdAndUpdate(
                 request.params.id,
                 updateData,
+                { new: true, runValidators: true }
             );
 
             return response.status(200).json({
