@@ -17,7 +17,7 @@ export const createProduct=async(request,response)=>{
       description,
       more_Details,
       publish,
-    } = req.body;
+    } = request.body;
 
 
 
