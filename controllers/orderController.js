@@ -7,7 +7,7 @@ import Order from "../models/order.modal.js";
 //create a order
 export const createOrder=async(request,response)=>{
     try {
-        const {userId}=request.userId;
+        const userId=request.userId;
         const { orderId, product_details, payment_id, payment_status, delivery_address, subTotalAmt, totalAmt, invoice_receipt } = request.body;
 
 
@@ -51,7 +51,7 @@ export const createOrder=async(request,response)=>{
 //Get All Orders of Logged-in User
 export const getUsersOrders=async(request,response)=>{
     try {
-        const {userId}=request.userId;
+        const userId=request.userId;
         //check user id
         if (!userId) {
             return response.status(400).json({
@@ -62,7 +62,7 @@ export const getUsersOrders=async(request,response)=>{
         }
         
         //find order from database
-        const orders=await Order.find(userId).sort({createdAt:-1});
+        const orders=await Order.find({userId}).sort({createdAt:-1});
         if(!orders){
             return response.status(404).json({
                  message: "please add order now",
@@ -89,7 +89,7 @@ export const getUsersOrders=async(request,response)=>{
 //get all orders for addmin
 export const getAllOrders=async(request,response)=>{
     try { 
-         const {userId}=request.userId;
+         const userId=request.userId;
         //check user id
         if (!userId) {
             return response.status(400).json({
@@ -100,7 +100,7 @@ export const getAllOrders=async(request,response)=>{
         }
 
         //get order
-        const orders =await Order.find().populate("userId", "name email");
+        const orders =await Order.find({userId}).populate("userId", "name email");
         if(!orders){
             return response.status(404).json({
                  message: "order not find",
@@ -128,7 +128,7 @@ export const getAllOrders=async(request,response)=>{
 //get single order by id
 export const getOrderById=async(request,response)=>{
     try {
-         const {userId}=request.userId;
+         const userId=request.userId;
         //check user id
         if (!userId) {
             return response.status(400).json({
@@ -177,7 +177,7 @@ export const getOrderById=async(request,response)=>{
 export const updateOrderSatus=async(request,response)=>{
     try {
         const {delivery_status}=request.body
-        const {userId}=request.userId;
+        const userId=request.userId;
         const {orderId}=request.params;
         //check user id
         if (!userId) {
@@ -227,7 +227,7 @@ export const updateOrderSatus=async(request,response)=>{
 export const deleteOrder=async(request,response)=>{
     try {
         
-        const {userId}=request.userId;
+        const userId=request.userId;
         const {orderId}=request.params;
         //check user id
         if (!userId) {
@@ -240,7 +240,7 @@ export const deleteOrder=async(request,response)=>{
 
         //check order id const {orderId}=request.params;
         if (!orderId) {
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "Order ID is required",
                 error: true,
                 success: false,
@@ -250,7 +250,7 @@ export const deleteOrder=async(request,response)=>{
         //delete from database
         const deleted = await Order.findByIdAndDelete(orderId);
         if (!deleted) {
-            return res.status(400).json({
+            return response.status(400).json({
                 message: "Order ID is required",
                 error: true,
                 success: false,
