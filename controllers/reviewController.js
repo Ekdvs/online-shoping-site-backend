@@ -1,5 +1,5 @@
-import Product from "../models/product.model";
-import Review from "../models/reviewModel";
+import Product from "../models/product.model.js";
+import Review from "../models/reviewModel.js";
 
 
 //add review & rating
