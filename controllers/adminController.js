@@ -35,11 +35,24 @@ export const getUserStatistics = async (request, response) => {
 //makerting message
 export const sendPromotionalEmail=async(request,response)=>{
     try { 
-        const { subject, message } = req.body;
+        const { subject, message } = request.body;
     const users = await UserModel.find({}, "email");
     const emailList = users.map(user => user.email);
+
+    if(!emailList){
+      return response.status(404).json({
+      message:'users emails not found',
+      error:true,
+      sucess:false,
+    })
+    }
         
     sendPromotional(emailList,subject, message)
+    return response.status(200).json({
+      message:'message send',
+      error:false,
+      sucess:true
+    })
     } catch (error) {
         response.status(500).json({
          message: "Error fetching stats", 
