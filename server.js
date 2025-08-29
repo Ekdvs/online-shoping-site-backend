@@ -11,6 +11,7 @@ import orderRouter from './routers/orderRoute.js';
 import couponRouter from './routers/couponRoutes.js';
 import adminRouter from './routers/adminRoutes.js';
 import addressRouter from './routers/addressRoute.js';
+import ratingRouter from './routers/ratingRoute.js';
 
 
 const app= express();
@@ -31,6 +32,7 @@ app.use('/api/address',addressRouter)
 app.use('/api/order',orderRouter)
 app.use('/api/coupon',couponRouter)
 app.use('/api/admin',adminRouter)
+app.use('/api/rating',ratingRouter)
 
 const Port=process.env.PORT||5000;
 
