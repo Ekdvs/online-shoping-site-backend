@@ -10,6 +10,7 @@ import cartRouter from './routers/cartRoute.js';
 import orderRouter from './routers/orderRoute.js';
 import couponRouter from './routers/couponRoutes.js';
 import adminRouter from './routers/adminRoutes.js';
+import addressRouter from './routers/addressRoute.js';
 
 
 const app= express();
@@ -26,7 +27,7 @@ app.use('/api/category',categoryRouter)
 app.use('/api/subCategory',subCategoryRouter)
 app.use('/api/products',productRouter)
 app.use('/api/cart',cartRouter)
-app.use('/api/address',cartRouter)
+app.use('/api/address',addressRouter)
 app.use('/api/order',orderRouter)
 app.use('/api/coupon',couponRouter)
 app.use('/api/admin',adminRouter)

@@ -198,7 +198,7 @@ export const updateOrderSatus=async(request,response)=>{
         }
 
         //check order from data base
-        const updatedOrder = await Order.findByIdAndUpdate(orderId, { delivery_status });
+        const updatedOrder = await Order.findByIdAndUpdate(orderId, { delivery_status },{ new: true, runValidators: true });
         if(!updatedOrder){
             return response.status(400).json({
                 message: "Order not found",
