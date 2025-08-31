@@ -1,35 +1,15 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-let cached = global.mongoose; // cache for serverless functions
-
-if (!cached) cached = global.mongoose = { conn: null };
+let cached = global.mongoose;
+if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
 const connectDB = async () => {
-  if (!process.env.MONGO_URL) {
-    throw new Error(
-      "Please define MONGO_URL variable inside the .env file"
-    );
+  if (cached.conn) return cached.conn;
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGO_URL).then(m => m);
   }
-
-  if (cached.conn) {
-    console.log("Using cached database connection");
-    return cached.conn;
-  }
-
-  try {
-    const opts = {
-      bufferCommands: false,
-      // other options if needed
-    };
-
-    const conn = await mongoose.connect(process.env.MONGO_URL, opts);
-    cached.conn = conn;
-    console.log("Successfully connected to database");
-    return conn;
-  } catch (error) {
-    console.error("Database connection failed:", error);
-    throw error;
-  }
+  cached.conn = await cached.promise;
+  return cached.conn;
 };
 
 export default connectDB;
