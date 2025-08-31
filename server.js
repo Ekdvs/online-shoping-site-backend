@@ -1,10 +1,8 @@
-import express from 'express';
+import express from 'express'
 import connectDB from "./configs/db.js";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-
-// Import routes
 import userRouter from './routers/userRoute.js';
+import cookieParser from "cookie-parser";
 import categoryRouter from './routers/categoryRoute.js';
 import subCategoryRouter from './routers/subCategoryRoute.js';
 import productRouter from './routers/productRoutes.js';
@@ -14,28 +12,36 @@ import couponRouter from './routers/couponRoutes.js';
 import adminRouter from './routers/adminRoutes.js';
 import addressRouter from './routers/addressRoute.js';
 import ratingRouter from './routers/ratingRoute.js';
+import cors from "cors";
 
+const app= express();
 dotenv.config();
-const app = express();
+app.use(cookieParser());
+app.use(cors({
+  origin: "http://localhost:5173", // your Vite frontend
+  credentials: true,
+}));
 
 // Middleware
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Middleware to parse JSON bodies
+app.use(express.urlencoded({ extended: true })); //
 
-// Routes
-app.use("/api/user", userRouter);
-app.use('/api/category', categoryRouter);
-app.use('/api/subCategory', subCategoryRouter);
-app.use('/api/products', productRouter);
-app.use('/api/cart', cartRouter);
-app.use('/api/address', addressRouter);
-app.use('/api/order', orderRouter);
-app.use('/api/coupon', couponRouter);
-app.use('/api/admin', adminRouter);
-app.use('/api/rating', ratingRouter);
+//Routes
+app.use("/api/user",userRouter);
+app.use('/api/category',categoryRouter)
+app.use('/api/subCategory',subCategoryRouter)
+app.use('/api/products',productRouter)
+app.use('/api/cart',cartRouter)
+app.use('/api/address',addressRouter)
+app.use('/api/order',orderRouter)
+app.use('/api/coupon',couponRouter)
+app.use('/api/admin',adminRouter)
+app.use('/api/rating',ratingRouter)
 
-// Connect DB but DO NOT start server here
-connectDB().then(() => console.log("MongoDB connected"));
+const Port=process.env.PORT||5000;
 
-export default app; // Export app for serverless
+connectDB().then(()=>{
+    app.listen(Port,()=>{
+    console.log(`🚀 Server running on port ${Port}`)
+})
+})
