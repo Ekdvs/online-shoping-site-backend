@@ -12,11 +12,15 @@ import couponRouter from './routers/couponRoutes.js';
 import adminRouter from './routers/adminRoutes.js';
 import addressRouter from './routers/addressRoute.js';
 import ratingRouter from './routers/ratingRoute.js';
-
+import cors from "cors";
 
 const app= express();
 dotenv.config();
 app.use(cookieParser());
+app.use(cors({
+  origin: "http://localhost:5173", // your Vite frontend
+  credentials: true,
+}));
 
 // Middleware
 app.use(express.json()); // Middleware to parse JSON bodies
