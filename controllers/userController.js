@@ -100,20 +100,20 @@ export const loginUsers =async(request,response)=>{
                 success:false
             });
         }
-          // Verify password
+          // Verify email
         
         if(!user.verify_email){
             return response.status(400).json({
-                message:'Verfiy email before the login',
+                message:'Please verify your email before logging in',
                 error:true,
                 success:false
             });
         }
-          // Verify email
+          // Verify password
         const checkpassword= await bcrypt.compare(password,user.password);
         if(!checkpassword){
             return response.status(400).json({
-                message:'Invalid Credentials (Userpassword not correct)',
+                message:'Invalid Credentials (Incorrect password)',
                 error:true,
                 success:false
             });
