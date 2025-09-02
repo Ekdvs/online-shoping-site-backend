@@ -30,7 +30,7 @@ userRouter.post('/verify-email',verifyEmail)
 //uploade profile picture
 userRouter.put('/upload-avatar',auth,upload.single('avatar'), uploadAvatar)
 
-//admin get all users
+//admin get all users by admin
 userRouter.get('/allusers',auth,admin,getAllUsers)
 
 // get user by email
