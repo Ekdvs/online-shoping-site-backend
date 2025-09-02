@@ -699,3 +699,29 @@ export const resetPassword = async (request, response) => {
     });
   }
 };
+
+//user get data
+export const getUserData = async (request, response)=>{
+  
+    try {
+        // req.user comes from auth middleware
+        const user = request.user; 
+        if(!user){
+          return response.status(404).json({
+            message: "User not found",
+            error: true,
+            success: false,
+          });
+        }
+        response.status(200).json({ 
+          success: true,
+          data: user ,
+          message:"User data fetched successfully",
+        });
+    } catch (error) {
+        response.status(500).json({ 
+          success: false, 
+          error:true,
+          message: error.message });
+    }
+}
