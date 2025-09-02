@@ -18,7 +18,7 @@ const app= express();
 dotenv.config();
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173","https://online-shopping-site-frontend.vercel.app", // your Vite frontend
+  origin: ["http://localhost:5173","https://online-shopping-site-frontend.vercel.app"], // your Vite frontend
   credentials: true,
 }));
 
