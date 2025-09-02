@@ -16,7 +16,7 @@ userRouter.post('/login',loginUsers);
 userRouter.post('/logout',auth,logoutUsers);
 
 //update user
-userRouter.put('/update-user',auth,updateUsers);
+router.put("/update-user", auth, upload.single("avatar"), updateUsers);
 
 //delete user account
 userRouter.delete('/delete',auth,deleteUser);
@@ -45,6 +45,7 @@ userRouter.post('/verify-forgot-otp',verifyForgotPasswordOtp);
 //password change 
 userRouter.post('/reset-password', resetPassword);
 
+//get user data
 userRouter.get('/me',getUserData );
 
 export  default userRouter;

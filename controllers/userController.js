@@ -163,99 +163,86 @@ export const loginUsers =async(request,response)=>{
 
 //logout
 
-export const logoutUsers=async(request,response)=>{
- try {
-    const userId= request.userId;
-    //check user
-    if(!userId){
-        return response.status(401).json({
-            message:"User not Found",
-            error:true,
-            success:false,
-        })
+export const logoutUsers = async (req, res) => {
+  try {
+    const userId = req.userId;
 
+    if (!userId) {
+      return res.status(401).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
     }
-    //cookie setting
-    const cookieOption={
-        httpOnly:true,
-        secure:true,
-        sameSite:'None',
 
+    const cookieOption = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // only secure in production
+      sameSite: 'None',
+    };
 
-    }
-    //clear cookies
+    // Clear cookies
+    res.clearCookie("accessToken", cookieOption);
+    res.clearCookie("refreshToken", cookieOption); // fixed typo
 
-    response.clearCookie("accessToken",cookieOption);
-    response.clearCookie("refeshToken",cookieOption);
+    // Remove refresh token from DB
+    await UserModel.findByIdAndUpdate(userId, { refresh_token: null });
 
-    //remove refesh token from database
-    const removerefeshToken=await UserModel.findByIdAndUpdate(userId ,{
-        refresh_token:''
-    })
+    return res.status(200).json({
+      message: "User logged out successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({
+      message: "Something went wrong during logout",
+      error: true,
+      success: false,
+    });
+  }
+};
 
-    return response.status(200).json({
-        message:'User Logged Out successfully',
-        data:removerefeshToken,
-        error:false,
-        success:true
-    })
-    
- } catch (error) {
-    return response.status(500).json({
-                message:'Something went wrong during logout',
-                error:true,
-                success:false
-            });
- }
-}
 
 //update user details
 
-export const updateUsers=async(request,response)=>{
-    try {
-        const userId=request.userId;
-        const {name,mobile,password}=request.body;
+export const updateUsers = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { name, mobile } = req.body;
+    const image = req.file;
 
-        //check user
-        if(!userId){
-            return response.status(401).json({
-            message:"User not Found",
-            error:true,
-            success:false,
-        })
-        }
+    if (!userId)
+      return res.status(401).json({ message: "User not found", success: false });
 
-        //password hashed
-        let hashedPassword;
+    const existingUser = await UserModel.findById(userId);
+    if (!existingUser)
+      return res.status(404).json({ message: "User not found in database", success: false });
 
-        if(password){
-            hashedPassword=await bcrypt.hash(password,16)
-        }
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (mobile) updateData.mobile = mobile;
 
-        //update data base
-        const updateUser=await UserModel.updateOne({_id:userId},
-            {
-                name,
-                mobile,
-                password:hashedPassword?hashedPassword:undefined
-            }
-        )
-        return response.status(200).json({
-            message:'User update successfully',
-            data:updateUser,
-            error:false,
-            success:true,
-        })
-
-        
-    } catch (error) {
-        return response.status(500).json({
-                message:'Something went wrong during logout',
-                error:true,
-                success:false
-            });
+    if (image) {
+      if (existingUser.avatar) {
+        const publicId = existingUser.avatar.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
+      const upload = await uploadImageCloudinary(image);
+      updateData.avatar = upload.secure_url;
     }
-} 
+
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    }).select("-password -refresh_token");
+
+    res.status(200).json({ message: "User updated successfully", data: updatedUser, success: true });
+  } catch (error) {
+    console.error("Update user error:", error);
+    res.status(500).json({ message: "Something went wrong", success: false });
+  }
+};
+
 
 // delete user account
 
