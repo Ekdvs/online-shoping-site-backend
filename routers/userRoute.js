@@ -16,7 +16,7 @@ userRouter.post('/login',loginUsers);
 userRouter.post('/logout',auth,logoutUsers);
 
 //update user
-router.put("/update-user", auth, upload.single("avatar"), updateUsers);
+userRouter.put("/update-user", auth, upload.single("avatar"), updateUsers);
 
 //delete user account
 userRouter.delete('/delete',auth,deleteUser);
