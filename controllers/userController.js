@@ -175,17 +175,19 @@ export const logoutUsers = async (req, res) => {
       });
     }
 
-    const cookieOption = {
+    // Cookie options
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // only secure in production
-      sameSite: 'None',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
+      path: "/", // Important to actually clear the cookie
     };
 
     // Clear cookies
-    res.clearCookie("accessToken", cookieOption);
-    res.clearCookie("refreshToken", cookieOption); // fixed typo
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
 
-    // Remove refresh token from DB
+    // Remove refresh token from database
     await UserModel.findByIdAndUpdate(userId, { refresh_token: null });
 
     return res.status(200).json({
@@ -211,23 +213,36 @@ export const updateUsers = async (req, res) => {
     const userId = req.userId;
     const { name, mobile } = req.body;
     const image = req.file;
-
-    if (!userId)
-      return res.status(401).json({ message: "User not found", success: false });
+     console.log("hiiiiiiiiiii");
+    if (!userId) {
+      return res.status(401).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
 
     const existingUser = await UserModel.findById(userId);
-    if (!existingUser)
-      return res.status(404).json({ message: "User not found in database", success: false });
+    if (!existingUser) {
+      return res.status(404).json({
+        message: "User not found in database",
+        error: true,
+        success: false,
+      });
+    }
 
     const updateData = {};
     if (name) updateData.name = name;
     if (mobile) updateData.mobile = mobile;
 
     if (image) {
+      // Remove old avatar if exists
       if (existingUser.avatar) {
         const publicId = existingUser.avatar.split("/").pop().split(".")[0];
         await cloudinary.uploader.destroy(publicId);
       }
+
+      // Upload new avatar
       const upload = await uploadImageCloudinary(image);
       updateData.avatar = upload.secure_url;
     }
@@ -236,10 +251,19 @@ export const updateUsers = async (req, res) => {
       new: true,
     }).select("-password -refresh_token");
 
-    res.status(200).json({ message: "User updated successfully", data: updatedUser, success: true });
+    return res.status(200).json({
+      message: "User updated successfully",
+      data: updatedUser,
+      success: true,
+      error: false,
+    });
   } catch (error) {
     console.error("Update user error:", error);
-    res.status(500).json({ message: "Something went wrong", success: false });
+    return res.status(500).json({
+      message: "Something went wrong during update",
+      error: true,
+      success: false,
+    });
   }
 };
 
