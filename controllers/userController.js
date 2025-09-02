@@ -225,7 +225,7 @@ export const updateUsers=async(request,response)=>{
         })
         }
 
-        //password hash
+        //password hashed
         let hashedPassword;
 
         if(password){
