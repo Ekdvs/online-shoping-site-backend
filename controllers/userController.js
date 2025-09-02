@@ -328,11 +328,13 @@ export const forgotPassword = async (request, response) => {
     }
 
     // Create OTP
-    // const otp = generatedOtp();
+    const otp = generatedOtp();
     console.log("Generated OTP:", otp);
+    
 
     // OTP valid for 5 minutes
     const otpExpiry = Date.now() + 5 * 60 * 1000;
+    sendOtp(user,otp);
 
     // Update user
     const updateUser = await UserModel.findByIdAndUpdate(user._id, {
@@ -491,8 +493,11 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
     }
 
     //check otp expire
+    console.log(otp);
+    console.log(user.forgot_password_otp)
 
-    const currentTime=new Date().toISOString();
+
+    const currentTime=new Date();
     if(user.forgot_password_expiry<currentTime){
       return response.status(400).json({
         message:'Otp expaired',
@@ -502,7 +507,7 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
     }
 
     //check otp
-    if(otp==user.forgot_password_otp){
+    if(otp!==user.forgot_password_otp){
       return response.status(400).json({
         message:'Otp invalid',
         error:true,
@@ -511,7 +516,7 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
     }
 
     //update database
-    const updateUser=await UserModel.findByIdAndUpdate(user?._id,{
+    await UserModel.findByIdAndUpdate(user._id,{
       forgot_password_expiry:'',
       forgot_password_otp:''
     })
@@ -533,6 +538,7 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
   }
 
 }
+
 
 //get all users (for Admin)
 export const getAllUsers=async (request,response)=>{
@@ -647,3 +653,49 @@ export const adminDeleteUser=async (request,response)=>{
     });
   }
 }
+
+//reset password
+export const resetPassword = async (request, response) => {
+  try {
+    const { email, password } = request.body;
+
+    // Validate input
+    if (!email || !password) {
+      return response.status(400).json({
+        message: "Email and password are required",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Find user
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return response.status(404).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update password
+    user.password = hashedPassword;
+    await user.save();
+
+    return response.status(200).json({
+      message: "Password reset successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({
+      message: "Internal Server Error",
+      error: true,
+      success: false,
+    });
+  }
+};
