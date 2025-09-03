@@ -52,7 +52,7 @@ export const createCardItem=async(request,response)=>{
             message: 'product add to cart',
             data:cartItem,
             error:false,
-            sucess:true,
+            success:true,
         })
         
     } 

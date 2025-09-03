@@ -28,8 +28,9 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
     },
     delivery_address: {
-      type: Object,
-      required: [true,'Provide dilivery address'],
+      type: mongoose.Schema.ObjectId,
+      ref: "Address",
+      required: [true, "Provide delivery address"],
     },
     delivery_status: {
       type: String,

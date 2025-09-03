@@ -1,5 +1,5 @@
 import express from "express";
-import { createOrder, deleteOrder, getAllOrders, getOrderById, getTopSellingProucts, getUsersOrders, updateOrderSatus } from "../controllers/orderController.js";
+import { createOrder, deleteOrder, getAllOrders, getOrderById, getUsersOrders } from "../controllers/orderController.js";
 import auth from "../middleweare/auth.js";
 import admin from "../middleweare/admin.js";
 
@@ -15,11 +15,11 @@ orderRouter.get('/orders',auth,admin,getAllOrders);
 //get order by orderid
 orderRouter.get('/:orderId',auth,getOrderById);
 //update order status
-orderRouter.put('/:orderId',auth,updateOrderSatus);
+//orderRouter.put('/:orderId',auth,updateOrderStatus);
 //delete or cancel order
 orderRouter.delete('/:orderId',auth,deleteOrder);
 //best selling
-orderRouter.get('/top-selling',auth,admin,getTopSellingProucts)
+//orderRouter.get('/top-selling',auth,admin,getTopSellingProucts)
 
 
 export default orderRouter;
