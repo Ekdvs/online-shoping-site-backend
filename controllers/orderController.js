@@ -10,7 +10,8 @@ export const createOrder=async(request,response)=>{
         const userId=request.userId;
         const { orderId, product_details, payment_id, payment_status, delivery_address, subTotalAmt, totalAmt, invoice_receipt } = request.body;
 
-
+        console.log("UserID:", request.userId);
+console.log("Payload:", request.body);
         //check user id
         if (!userId) {
             return response.status(400).json({
