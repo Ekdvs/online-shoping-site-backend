@@ -1,40 +1,43 @@
 import Product from "../models/product.model.js";
 import Review from "../models/reviewModel.js";
-
-
+import User from "../models/user.model.js";
 //add review & rating
-export const addReview=async(request,response)=>{
-    try {
 
-        //get details
-        const{productId,rating,comment}=request.body;
-        //get user id
-        const userId=request.userId;
 
-    if(!productId||!rating||!comment){
-        return response.status(404).json({
-            message:'Product, rating, and comment are required',
-            error:true,
-            sucess:false,
-        })
+export const addReview = async (request, response) => {
+  try {
+    const { productId, rating, comment } = request.body;
+    const userId = request.userId; // set by auth middleware
 
+    if (!productId || !rating || !comment?.trim()) {
+      return response.status(400).json({
+        message: "Product, rating, and comment are required",
+        error: true,
+        success: false,
+      });
     }
 
-    //check product exist
-    const product =await Product.findById(productId);
-    if(!product){
-        return response.status(404).json({
-            message:'Product not found',
-            error:true,
-            sucess:false,
-        })
+    const product = await Product.findById(productId);
+    if (!product) {
+      return response.status(404).json({
+        message: "Product not found",
+        error: true,
+        success: false,
+      });
     }
 
-    //check user
-    const user=await User.findById({userId});
-    // Check if user already reviewed
-    const alreadyReviewed = await Review.findOne({ user: userId, product: productId });
-    if (alreadyReviewed) {
+    const user = await User.findById(userId); // ✅ FIX: no { userId }
+    if (!user) {
+      return response.status(404).json({
+        message: "User not found",
+        error: true,
+        success: false,
+      });
+    }
+
+    // prevent double review
+    const already = await Review.findOne({ user: userId, product: productId });
+    if (already) {
       return response.status(400).json({
         message: "You already reviewed this product",
         error: true,
@@ -47,59 +50,71 @@ export const addReview=async(request,response)=>{
       user: userId,
       product: productId,
       name: user.name || "Anonymous",
-      rating,
-      comment,
+      rating: Number(rating), // ensure number
+      comment: comment.trim(),
     });
 
-    // Update product rating
+    // recalc product stats
     const reviews = await Review.find({ product: productId });
-    const totalRating = reviews.reduce((acc, r) => acc + r.rating, 0);
-    const avgRating = totalRating / reviews.length;
+    const totalRating = reviews.reduce((acc, r) => acc + Number(r.rating || 0), 0);
+    const avgRating = reviews.length ? totalRating / reviews.length : 0;
 
     product.averageRating = avgRating;
     product.totalReviews = reviews.length;
     await product.save();
 
     return response.status(200).json({
-        message: "Review added successfully",
-        data: review,
-        success: true,
-    })
-
-        
-    } 
-    catch (error) {
-        return res.status(500).json({
-            message: "Something went wrong",
-            error: true,
-            success: false,
-        }); 
-    }
-}
-
-//get all reviews for a products
-
-export const getReviews = async (req, res) => {
-  try {
-    const { productId } = req.params;
-
-    const reviews = await Review.find({ product: productId })
-      .populate("User", "name") // Optional: show user details
-      .sort({ createdAt: -1 });
-
-    res.status(200).json({
-      message: "Reviews fetched successfully",
-      data: reviews,
+      message: "Review added successfully",
+      data: review,
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
+    console.error("addReview error:", error);
+    return response.status(500).json({
+      message: "Something went wrong",
+      error: true,
+      success: false,
+    }); // ✅ FIX: use `response`, not `res`
+  }
+};
+
+export const getReviews = async (request, response) => {
+  try {
+    const { productId } = request.params;
+
+    const reviews = await Review.find({ product: productId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const total = reviews.length;
+    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let sum = 0;
+
+    reviews.forEach((r) => {
+      const rt = Number(r.rating || 0);
+      if (rt >= 1 && rt <= 5) distribution[rt] += 1;
+      sum += rt;
+    });
+
+    const average = total ? sum / total : 0;
+
+    return response.status(200).json({
+      reviews,
+      total,
+      average,
+      distribution,
+      success: true,
+    });
+  } catch (error) {
+    console.error("getReviews error:", error);
+    return response.status(500).json({
+      message: "Failed to fetch reviews",
+      error: true,
       success: false,
     });
   }
 };
+
 
 //Update Review
 export const updateReview = async (req, res) => {

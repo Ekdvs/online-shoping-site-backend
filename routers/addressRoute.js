@@ -9,7 +9,7 @@ addressRouter.post('/create',auth,createAdress);
 //get address
 addressRouter.get('/get',auth,getAddresses);
 //get address by id
-addressRouter.get('/:addressId',auth,getAddressById);
+addressRouter.get('/get/:addressId',auth,getAddressById);
 //update address
 addressRouter.put('/update/:addressId',auth,updateAddress);
 //delete address

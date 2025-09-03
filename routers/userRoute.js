@@ -46,6 +46,9 @@ userRouter.post('/verify-forgot-otp',verifyForgotPasswordOtp);
 userRouter.post('/reset-password', resetPassword);
 
 //get user data
-userRouter.get('/me',getUserData );
+userRouter.get('/me',auth,getUserData );
+
+//password change  when login
+userRouter.post('/login-reset-password', auth, resetPassword);
 
 export  default userRouter;

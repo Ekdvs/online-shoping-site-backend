@@ -142,7 +142,7 @@ export const loginUsers =async(request,response)=>{
         return response.status(201).json({
                 message:'User Logged in Successfully',
                 data:{updateUser,
-                    accessToken,
+                    accessToken, 
                     refeshToken,
                 },
                 error:false,
@@ -715,8 +715,20 @@ export const resetPassword = async (request, response) => {
 export const getUserData = async (request, response)=>{
   
     try {
-        // req.user comes from auth middleware
-        const user = request.user; 
+        const userId=request.userId;
+        
+
+        //check user
+        if(!userId){
+            return response.status(401).json({
+            message:"Unauthorized",
+            error:true,
+            success:false,
+        })
+        }
+
+        //user from the database
+        const user=await UserModel.findById(userId);
         if(!user){
           return response.status(404).json({
             message: "User not found",

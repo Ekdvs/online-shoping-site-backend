@@ -36,7 +36,7 @@ app.use('/api/address',addressRouter)
 app.use('/api/order',orderRouter)
 app.use('/api/coupon',couponRouter)
 app.use('/api/admin',adminRouter)
-app.use('/api/rating',ratingRouter)
+app.use('/api/reviews',ratingRouter)
 
 const Port=process.env.PORT||5000;
 
