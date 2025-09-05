@@ -98,7 +98,7 @@ export const updateSubCategory = async(request,response)=>{
             );
 
             return response.status(200).json({
-                message: "SubCategory updated", 
+                message: "SubCategory updated Successfully", 
                 data: updated,
                 error:false,
                 success:true,
@@ -108,7 +108,8 @@ export const updateSubCategory = async(request,response)=>{
     catch (error) {
         return response.status(500).json({
             message: "Server error", 
-            error: error.message
+            error: error.message,
+            success: false,
         })
     }
 }
@@ -168,10 +169,10 @@ export const getSubCategoryByName= async(request,response)=>{
 export const deleteSubCategory=async(request,response)=>{
     try {
         //get id usin params
-    const {subcategoryId}=request.params;
+    const {id}=request.params;
 
-    const deleted=await SubCategory.findByIdAndDelete(subcategoryId);
-    
+    const deleted=await SubCategory.findByIdAndDelete(id);
+
     if(!deleted){
         return response.status(400).json({
             message:'SubCategory not found',
