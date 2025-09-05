@@ -70,7 +70,7 @@ export const updateSubCategory = async(request,response)=>{
         const imageFile=request.file;
 
         //get category
-        const subCategory=await SubCategory.findOne({name})
+        const subCategory=await SubCategory.findById(request.params.id);
 
         if(!subCategory){
             return response.status(404).json({
