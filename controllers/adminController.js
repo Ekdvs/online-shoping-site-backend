@@ -40,7 +40,7 @@ export const sendPromotionalEmail=async(request,response)=>{
       return response.status(404).json({
       message:'users emails not found',
       error:true,
-      sucess:false,
+      success:false,
     })
     }
         
@@ -48,7 +48,7 @@ export const sendPromotionalEmail=async(request,response)=>{
     return response.status(200).json({
       message:'message send',
       error:false,
-      sucess:true
+      success:true
     })
     } catch (error) {
         response.status(500).json({

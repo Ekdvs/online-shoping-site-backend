@@ -16,7 +16,7 @@ export const createCardItem=async(request,response)=>{
             return response.status(404).json({
                 message: "Please login",
                 error:true,
-                sucess:false
+                success:false
             })
         }
         
@@ -27,7 +27,7 @@ export const createCardItem=async(request,response)=>{
             return response.status(404).json({
                 message:"Product Not Found",
                 error:true,
-                sucess:false
+                success:false
             })
         }
 
@@ -73,7 +73,7 @@ export const getUserCart=async(request,response)=>{
             return response.status(404).json({
                 message: "Please login",
                 error:true,
-                sucess:false
+                success:false
             })
         }
 
@@ -85,7 +85,7 @@ export const getUserCart=async(request,response)=>{
             return response.status(404).json({
                 message: "cart item is empty",
                 error:true,
-                sucess:false
+                success:false
             })
         }
 
@@ -116,7 +116,7 @@ export const updateCartItem=async(request,response)=>{
             return response.status(404).json({
                 message: "Please login",
                 error:true,
-                sucess:false
+                success:false
             })
         }
 
@@ -131,7 +131,7 @@ export const updateCartItem=async(request,response)=>{
       return response.status(404).json({ 
         message: "Cart item not found", 
         error: true ,
-        sucess:false
+        success:false
     });
     }
 
@@ -163,7 +163,7 @@ export const deleteCartItem=async(request,response)=>{
             return response.status(404).json({
                 message: "Please login",
                 error:true,
-                sucess:false
+                success:false
             })
         }
 
@@ -174,14 +174,14 @@ export const deleteCartItem=async(request,response)=>{
              return response.status(404).json({
                 message: "Cart item not found",
                 error:true,
-                sucess:false
+                success:false
             })
         }
 
         return response.status(200).json({
                 message: "Cart item deleted successfully",
                 error:false,
-                sucess:true
+                success:true
             })
 
         

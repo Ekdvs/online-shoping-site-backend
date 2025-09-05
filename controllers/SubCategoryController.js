@@ -13,7 +13,7 @@ export const createSubCategory = async(request,response)=>{
             return response.status(400).json({
                 message:"Name, Image and CategoryId are required",
                 error:true,
-                sucess:false,
+                success:false,
             })
 
         }
@@ -121,7 +121,7 @@ export const getAllSubCategories = async(request,response)=>{
             message:"retreview all subcategory",
             data:subCategory,
             error:false,
-            sucess:true,
+            success:true,
         })
     } catch (error) {
          return response.status(500).json({
@@ -143,7 +143,7 @@ export const getSubCategoryByName= async(request,response)=>{
             return response.status(400).json({
                 message:'SubCategory not found',
                 error:true,
-                sucess:false
+                success:false
             })
         }
 
@@ -176,13 +176,13 @@ export const deleteSubCategory=async(request,response)=>{
         return response.status(400).json({
             message:'SubCategory not found',
             error:true,
-            sucess:false
+            success:false
         })
     }
     response.status(200).json({
         message:'SubCategory deleted',
         error:true,
-        sucess:false,
+        success:false,
     })
         
     } catch (error) {

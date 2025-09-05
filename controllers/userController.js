@@ -489,7 +489,7 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
       return response.status(400).json({
         message:'Provide email and otp',
         error:true,
-        sucess:false,
+        success:false,
       })
   }
     //check user
@@ -499,7 +499,7 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
       return response.status(400).json({
         message:'Not found User',
         error:true,
-        sucess:false,
+        success:false,
       })
     }
 
@@ -513,7 +513,7 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
       return response.status(400).json({
         message:'Otp expaired',
         error:true,
-        sucess:false,
+        success:false,
       })
     }
 
@@ -522,7 +522,7 @@ export const verifyForgotPasswordOtp= async (request,response)=>{
       return response.status(400).json({
         message:'Otp invalid',
         error:true,
-        sucess:false,
+        success:false,
       })
     }
 
