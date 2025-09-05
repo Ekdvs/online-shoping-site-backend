@@ -11,7 +11,7 @@ const sub_categorySchema=new mongoose.Schema(
             required:true,
         },
         categoryId:{
-            type:[mongoose.Schema.ObjectId],
+            type:mongoose.Schema.ObjectId,
             ref:'Category',
             required:[true,'Provide Sub category image'],
         },
