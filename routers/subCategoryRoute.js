@@ -2,7 +2,7 @@ import express from 'express'
 import auth from '../middleweare/auth.js';
 import admin from '../middleweare/admin.js';
 import upload from '../middleweare/multer.js';
-import { createSubCategory, deleteSubCategory, getAllSubCategories, getSubCategoryByName, updateSubCategory } from '../controllers/SubCategoryController.js';
+import { createSubCategory, deleteSubCategory, getAllSubCategories, getSubCategoryById, getSubCategoryByName, updateSubCategory } from '../controllers/SubCategoryController.js';
 const subCategoryRouter = express.Router(); 
 
 // Create subcategory (Admin only, with image upload)
@@ -20,4 +20,6 @@ subCategoryRouter.get('/getall',getAllSubCategories);
 //delete subcategory(admin only)
 subCategoryRouter.delete('/delete/:id',auth,admin,deleteSubCategory)
 
+// Get subcategory by ID
+subCategoryRouter.get("/subcategory/get/:id", getSubCategoryById);
 export default subCategoryRouter;
