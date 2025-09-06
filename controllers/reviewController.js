@@ -196,26 +196,22 @@ export const deleteReview = async (req, res) => {
 //get all reviews for admin
 export const getAllReviews = async (req, res) => {
   try {
-    const userId = req.userId;
-    const isAdmin = req.isAdmin;
-    if (!isAdmin) {
-      return res.status(403).json({ message: "Access denied", success: false });
-    }
     const reviews = await Review.find()
-      .populate("user", "name email") // populate user details
-      .populate("product", "name") // populate product details
+      .populate("user", "name email")
+      .populate("product", "name")
       .sort({ createdAt: -1 });
 
     res.status(200).json({
-      message: "All reviews fetched successfully",
-      data: reviews,
       success: true,
+      message: "All reviews fetched successfully",
+      data:reviews,
+      
     });
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch reviews",
-      error: error.message,
       success: false,
+      message: "Failed to fetch all reviews",
+      error: error.message,
     });
   }
 };
