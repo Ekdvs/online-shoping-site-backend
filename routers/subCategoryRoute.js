@@ -21,5 +21,5 @@ subCategoryRouter.get('/getall',getAllSubCategories);
 subCategoryRouter.delete('/delete/:id',auth,admin,deleteSubCategory)
 
 // Get subcategory by ID
-subCategoryRouter.get("/subcategory/get/:id", getSubCategoryById);
+subCategoryRouter.get("/get/:id", getSubCategoryById);
 export default subCategoryRouter;
