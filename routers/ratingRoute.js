@@ -1,6 +1,6 @@
 import express from "express";
 import auth from "../middleweare/auth.js";
-import { addReview, deleteReview, getReviews, updateReview } from "../controllers/reviewController.js";
+import { addReview, deleteReview, getAllReviews, getReviews, updateReview } from "../controllers/reviewController.js";
 import admin from '../middleweare/admin.js';
 
 
@@ -14,5 +14,7 @@ ratingRouter.get('/getall/:productId',getReviews)
 ratingRouter.put('/update/:reviewId',auth,updateReview)
 //delete rating 
 ratingRouter.delete("/:reviewId", auth,admin, deleteReview); 
+//get all reviews for admin
+ratingRouter.get("/admin/getall", auth, admin, getAllReviews);
 
 export default ratingRouter;
