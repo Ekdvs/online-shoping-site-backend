@@ -1,0 +1,56 @@
+[33mcommit 7a323cc2d30f7f40d7c94f8538aa13edd12ef83e[m
+Author: Ekdvs <ekdvsampath02@gmail.com>
+Date:   Wed Sep 10 08:44:15 2025 +0530
+
+    add stripe
+
+[1mdiff --git a/node_modules/stripe/CHANGELOG.md b/node_modules/stripe/CHANGELOG.md[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d952f3f[m
+[1m--- /dev/null[m
+[1m+++ b/node_modules/stripe/CHANGELOG.md[m
+[36m@@ -0,0 +1,4176 @@[m
+[32m+[m[32m# Changelog[m
+[32m+[m[32m## 18.5.0 - 2025-08-27[m
+[32m+[m[32m* [#2392](https://github.com/stripe/stripe-node/pull/2392) Add section on private preview SDKs in readme[m
+[32m+[m[32m* [#2384](https://github.com/stripe/stripe-node/pull/2384) Update generated code. This release changes the pinned API version to `2025-08-27.basil`.[m
+[32m+[m[32m  * Add support for `balance_report`, `payout_details`, and `payout_reconciliation_report` on `AccountSession.components` and `AccountSessionCreateParams.components`[m
+[32m+[m[32m  * Add support for `name` on `BillingPortal.ConfigurationCreateParams`, `BillingPortal.ConfigurationUpdateParams`, and `BillingPortal.Configuration`[m
+[32m+[m[32m  * Add support for `installments` on `Charge.payment_method_details.alma`[m
+[32m+[m[32m  * Add support for `transaction_id` on `Charge.payment_method_details.alma`, `Charge.payment_method_details.amazon_pay`, `Charge.payment_method_details.billie`, `Charge.payment_method_details.kakao_pay`, `Charge.payment_method_details.kr_card`, `Charge.payment_method_details.naver_pay`, `Charge.payment_method_details.payco`, `Charge.payment_method_details.revolut_pay`, `Charge.payment_method_details.samsung_pay`, and `Charge.payment_method_details.satispay`[m
+[32m+[m[32m  * Add support for `location` and `reader` on `Charge.payment_method_details.paynow`[m
+[32m+[m[32m  * Add support for `amount_includes_iof` on `Checkout.Session.payment_method_options.pix`, `Checkout.SessionCreateParams.payment_method_options.pix`, `PaymentIntent.payment_method_options.pix`, `PaymentIntentConfirmParams.payment_method_options.pix`, `PaymentIntentCreateParams.payment_method_options.pix`, and `PaymentIntentUpdateParams.payment_method_options.pix`[m
+[32m+[m[32m  * Add support for new values `block` and `resolution` on enum `Dispute.payment_method_details.card.case_type`[m
+[32m+[m[32m  * Add support for new value `terminal_android_apk` on enums `File.purpose` and `FileListParams.purpose`[m
+[32m+[m[32m  * Add support for new value `terminal_android_apk` on enum `FileCreateParams.purpose`[m
+[32m+[m[32m  * Add support for `metadata` and `period` on `InvoiceCreatePreviewParams.schedule_details.phases[].add_invoice_items[]`, `SubscriptionCreateParams.add_invoice_items[]`, `SubscriptionSchedule.phases[].add_invoice_items[]`, `SubscriptionScheduleCreateParams.phases[].add_invoice_items[]`, `SubscriptionScheduleUpdateParams.phases[].add_invoice_items[]`, and `SubscriptionUpdateParams.add_invoice_items[]`[m
+[32m+[m[32m  * Add support for `exp_month` and `exp_year` on `Issuing.CardCreateParams`[m
+[32m+[m[32m  * Add support for `excluded_payment_method_types` on `PaymentIntentCreateParams` and `PaymentIntent`[m
+[32m+[m[32m  * Add support for `payout_method` on `PayoutCreateParams` and `Payout`[m
+[32m+[m[32m  * Add support for `mxn` on `Terminal.Configuration.tipping`, `Terminal.ConfigurationCreateParams.tipping`, and `Terminal.ConfigurationUpdateParams.tipping`[m
+[32m+[m[32m  * Add support for `card` on `Terminal.ReaderPresentPaymentMethodParams.testHelpers`[m
+[32m+[m[32m  * Add support for new value `card` on enum `Terminal.ReaderPresentPaymentMethodParams.testHelpers.type`[m
+[32m+[m[32m  * Add support for new value `2025-08-27.basil` on enum `WebhookEndpointCreateParams.api_version`[m
+[32m+[m[32m  * Add support for error codes `customer_session_expired` and `india_recurring_payment_mandate_canceled` on `Invoice.last_finalization_error`, `PaymentIntent.last_payment_error`, `SetupAttempt.setup_error`, `SetupIntent.last_setup_error`, and `StripeError`[m
+[32m+[m[32m* [#2389](https://github.com/stripe/stripe-node/pull/2389) fix(example): expires_at is in milliseconds[m
+[32m+[m
+[32m+[m[32m## 18.4.0 - 2025-07-30[m
+[32m+[m[32mThis release changes the pinned API version to `2025-07-30.basil`.[m
+[32m+[m
+[32m+[m[32m* [#2379](https://github.com/stripe/stripe-node/pull/2379) Update generated code[m
+[32m+[m[32m  * Add support for `instant_payouts_promotion` on `AccountSession.components` and `AccountSessionCreateParams.components`[m
+[32m+[m[32m  * Add support for `adjustable_quantity` on `BillingPortal.Configuration.features.subscription_update.products[]`, `BillingPortal.ConfigurationCreateParams.features.subscription_update.products[]`, and `BillingPortal.ConfigurationUpdateParams.features.subscription_update.products[]`[m
+[32m+[m[32m  * Remove support for value `disabled` from enum `Capability.status`[m
+[32m+[m[32m  * Add support for `transaction_id` on `Charge.payment_method_details.cashapp`[m
+[32m+[m[32m  * Add support for `origin_context` on `Checkout.SessionCreateParams` and `Checkout.Session`[m
+[32m+[m[32m  * Add support for `template` on `Checkout.Session.invoice_creation.invoice_data.rendering_options`, `Checkout.SessionCreateParams.invoice_creation.invoice_data.rendering_options`, `PaymentLink.invoice_creation.invoice_data.rendering_options`, `PaymentLinkCreateParams.invoice_creation.invoice_data.rendering_options`, and `PaymentLinkUpdateParams.invoice_creation.invoice_data.rendering_options`[m
+[32m+[m[32m  * Add support for `setup_future_usage` on `Checkout.Session.payment_method_options.pix` and `Checkout.SessionCreateParams.payment_method_options.pix`[m
+[32m+[m[32m  * Add support for new value `nz_bank_account` on enum `Checkout.SessionCreateParams.payment_method_types`[m
+[32m+[m[32m  * Change `Identity.VerificationSession.related_person.account` to be required[m
+[32m+[m[32m  * Change `Identity.VerificationSession.related_person.person` to be required[m
+[32m+[m[32m  * Add support for `duration` on `InvoiceCreatePreviewParams.schedule_details.phases[]`, `SubscriptionScheduleCreateParams.phases[]`, and `SubscriptionScheduleUpdateParams.phases[]`[m
+[32m+[m[32m  * Change type of `InvoiceCreatePreviewParams.subscription_details.cancel_at`, `SubscriptionCreateParams.cancel_at`, and `SubscriptionUpdateParams.cancel_at` from `DateTime` to `DateTime | enum('max_period_end'|'min_period_end')`[m
+[32m+[m[32m  * Add support for `price_data` on `PaymentLinkCreateParams.line_items[]`[m
+[32m+[m[32m  * Change `PaymentLinkCreateParams.line_items[].price` to be optional[m
+[32m+[m[32m  * Add support for new value `America/Coyhaique` on enum `Reporting.ReportRunCreateParams.parameters.timezone`[m
+[32m+[m[32m  * Add support for `standard` on `Tax.Registration.country_options.ae`, `Tax.Registration.country_options.au`, `Tax.Registration.country_options.ch`, `Tax.Registration.country_options.gb`, `Tax.Registration.country_options.jp`, `Tax.Registration.country_options.no`, `Tax.Registration.country_options.nz`, `Tax.Registration.country_options.sg`, `Tax.RegistrationCreateParams.country_options.ae`, `Tax.RegistrationCreateParams.country_options.al`, `Tax.RegistrationCreateParams.country_options.ao`, `Tax.RegistrationCreateParams.country_options.au`, `Tax.RegistrationCreateParams.country_options.aw`, `Tax.RegistrationCreateParams.country_options.ba`, `Tax.RegistrationCreateParams.country_options.bb`, `Tax.RegistrationCreateParams.country_options.bd`, `Tax.RegistrationCreateParams.country_options.bf`, `Tax.RegistrationCreateParams.country_options.bh`, `Tax.RegistrationCreateParams.country_options.bs`, `Tax.RegistrationCreateParams.country_options.cd`, `Tax.RegistrationCreateParams.country_options.ch`, `Tax.RegistrationCreateParams.country_options.et`, `Tax.RegistrationCreateParams.country_options.gb`, `Tax.RegistrationCreateParams.country_options.gn`, `Tax.RegistrationCreateParams.country_options.is`, `Tax.RegistrationCreateParams.country_options.jp`, `Tax.RegistrationCreateParams.country_options.me`, `Tax.RegistrationCreateParams.country_options.mk`, `Tax.RegistrationCrea
