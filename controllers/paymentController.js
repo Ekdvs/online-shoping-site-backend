@@ -86,15 +86,18 @@ export const getPaymentReceipt = async (request, response) => {
 //
 
 //Handle Stripe Webhook
-export const handleStripeWebhook = async (request, response) => {
-  const sig = request.headers["stripe-signature"];
-
+export const handleStripeWebhook = async (req, res) => {
   try {
-    const event = stripe.webhooks.constructEvent(
-      request.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
+    const sig = req.headers["stripe-signature"];
+    if (!sig) return res.status(400).send("Missing stripe-signature header");
+
+    // Choose correct secret based on environment
+    const webhookSecret =
+      process.env.NODE_ENV === "production"
+        ? process.env.STRIPE_WEBHOOK_SECRET
+        : process.env.STRIPE_LOCAL_WEBHOOK_SECRET;
+
+    const event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
 
     switch (event.type) {
       case "payment_intent.succeeded": {
@@ -104,8 +107,10 @@ export const handleStripeWebhook = async (request, response) => {
 
         await Payment.findOneAndUpdate(
           { stripePaymentIntentId: paymentIntent.id },
-          { status: "succeeded", receipt_url: receiptUrl, raw: paymentIntent }
+          { status: "succeeded", receipt_url: receiptUrl, raw: paymentIntent },
+          { new: true }
         );
+        console.log("✅ PaymentIntent succeeded:", paymentIntent.id);
         break;
       }
 
@@ -113,8 +118,10 @@ export const handleStripeWebhook = async (request, response) => {
         const paymentIntent = event.data.object;
         await Payment.findOneAndUpdate(
           { stripePaymentIntentId: paymentIntent.id },
-          { status: "failed", raw: paymentIntent }
+          { status: "failed", raw: paymentIntent },
+          { new: true }
         );
+        console.log("❌ PaymentIntent failed:", paymentIntent.id);
         break;
       }
 
@@ -122,24 +129,23 @@ export const handleStripeWebhook = async (request, response) => {
         const charge = event.data.object;
         await Payment.findOneAndUpdate(
           { stripePaymentIntentId: charge.payment_intent },
-          { receipt_url: charge.receipt_url, raw: charge }
+          { receipt_url: charge.receipt_url, raw: charge },
+          { new: true }
         );
+        console.log("💰 Charge succeeded:", charge.id);
         break;
       }
 
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        console.log(`Unhandled event type: ${event.type}`);
     }
 
-    response.status(200).json({ 
-      received: true 
-    });
+    res.status(200).json({ received: true });
   } catch (err) {
     console.error("Webhook Error:", err.message);
-    response.status(400).send(`Webhook Error: ${err.message}`);
+    res.status(400).send(`Webhook Error: ${err.message}`);
   }
 };
-
 // Get All Payments for a User
 export const getUserPayments = async (request, response) => {
   try {
@@ -227,3 +233,4 @@ export const getAllPayments = async (request, response) => {
     });
   }
 };
+
