@@ -15,6 +15,7 @@ import adminRouter from "./routers/adminRoutes.js";
 import addressRouter from "./routers/addressRoute.js";
 import ratingRouter from "./routers/ratingRoute.js";
 import paymentRouter from "./routers/paymentRoutes.js";
+import { handleStripeWebhook } from "./controllers/paymentController.js";
 
 dotenv.config();
 const app = express();
@@ -32,7 +33,7 @@ app.use(
 app.use(
   "/api/payments/webhook",
   express.raw({ type: "application/json" }),
-  paymentRouter
+  handleStripeWebhook
 );
 
 // JSON parser for all other routes
