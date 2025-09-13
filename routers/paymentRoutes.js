@@ -32,8 +32,7 @@ paymentRouter.delete("/:id", auth, deletePayment);
 //admin get all payment
 paymentRouter.get("/admin/getall", auth, admin, getAllPayments);
 
-// Webhook route (no auth, raw body)
-paymentRouter.post("/webhook", 
-  handleStripeWebhook);
+
 
 export default paymentRouter;
+
