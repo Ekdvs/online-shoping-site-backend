@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import axios from "axios";
 import Payment from "../models/payment.modal.js";
 import Order from "../models/order.modal.js";
-import { sendPaymentSuccess } from "../emails/sendMail.js";
+import {  sendPaymentSuccess } from "../emails/sendMail.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -79,10 +79,12 @@ export const getPaymentReceipt = async (request, response) => {
       .populate("userId", "name email")
       .populate("delivery_address");
 
-    // Send email only if user email exists
-    if (order?.userId?.email) {
+    if (order?.userId?.email && order?.userId?.name) {
+      // Send payment success email
       await sendPaymentSuccess(order, payment);
-      //console.log("📧 Payment success email sent to:", order.userId.email);
+
+
+      console.log("📧 Emails sent to:", order.userId.email);
     }
 
     response.status(200).json({ 
@@ -92,7 +94,7 @@ export const getPaymentReceipt = async (request, response) => {
     
 
   } catch (err) {
-    onsole.error("Error in getPaymentReceipt:", err.message);
+    console.error("Error in getPaymentReceipt:", err.message);
     response.status(500).json({ 
       success: false, message: "Internal Server Error", 
       error: err.message });

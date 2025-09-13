@@ -1,5 +1,6 @@
 import Order from "../models/order.modal.js";
 
+
 // Create Order
 export const createOrder = async (request, response) => {
   try {
@@ -40,13 +41,14 @@ export const createOrder = async (request, response) => {
       totalAmt,
     });
 
+
     return response.status(201).json({
       success: true,
       message: "Order placed",
       data: order,
     });
   } catch (error) {
-    //console.error(error);
+    console.error(error);
     return response.status(500).json({
       success: false,
       message: "Error creating order",
@@ -63,6 +65,7 @@ export const updateOrderStatus = async (request, response) => {
     const userId = request.userId;
     const { orderId } = request.params;
     const { delivery_status, payment_status, payment_id } = request.body;
+    
 
     //check user id
     if (!userId) {

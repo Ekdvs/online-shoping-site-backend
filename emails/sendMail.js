@@ -1,5 +1,5 @@
 import transporter from "../mailer.js";
-import { couponEmailTemplate, orderStatusTemplate, otpEmailTemplate, paymentSuccessSimpleTemplate, welcomeEmailTemplate } from "./mails.js";
+import { couponEmailTemplate,  otpEmailTemplate, paymentSuccessSimpleTemplate, welcomeEmailTemplate } from "./mails.js";
 
 
 
@@ -56,21 +56,6 @@ export const sendCoupon = async (emailList, username, coupon) => {
     console.log("✅ coupon email sent successfully!");
   } catch (err) {
     console.error("❌ Failed to send email:", err);
-  }
-};
-
-// Send order update email
-export const sendOrderUpdate = async (email, username, order) => {
-  try {
-    await transporter.sendMail({
-      from: `"Online Shopping" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: `Order Update - ${order._id}`,
-      html: orderStatusTemplate(username, order),
-    });
-    console.log(`✅ Order update email sent to ${email}`);
-  } catch (err) {
-    console.error(`❌ Failed to send order email to ${email}:`, err);
   }
 };
 

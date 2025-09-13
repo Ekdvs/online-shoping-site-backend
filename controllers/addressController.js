@@ -40,7 +40,7 @@ export const getAddresses = async (request, response) => {
     const userId = request.userId;
     //get all adress from data base
     const addresses = await AddressModel.find({ userId }).sort({ default: -1 });
-    console.log(addresses)
+   // console.log(addresses)
     return response.status(200).json({ 
       success: true, 
       data: addresses 

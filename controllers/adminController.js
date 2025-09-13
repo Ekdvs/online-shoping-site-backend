@@ -1,33 +1,87 @@
-
-import UserModel from "../models/user.model.js";
-import { sendPromotional } from "../emails/sendMail.js";
 import Order from "../models/order.modal.js";
+import UserModel from "../models/user.model.js";
 
-//get user statistics
-export const getUserStatistics = async (request, response) => {
+
+// Get Admin Dashboard Stats
+export const getUserStatistics = async (req, res) => {
   try {
+    // Total users & orders
     const totalUsers = await UserModel.countDocuments();
     const totalOrders = await Order.countDocuments();
-    const totalRevenue = await Order.aggregate([
+    
+    // Total revenue
+    const totalRevenueAgg = await Order.aggregate([
       { $group: { _id: null, total: { $sum: "$totalAmt" } } }
     ]);
+    const totalRevenue = totalRevenueAgg[0]?.total || 0;
 
-    response.json({
-      message: "Admin stats fetched",
+    // Daily revenue for last 7 days
+    const dailyRevenueAgg = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          revenue: { $sum: "$totalAmt" },
+        },
+      },
+      { $sort: { "_id": 1 } },
+      { $limit: 7 },
+    ]);
+    const dailyRevenue = dailyRevenueAgg.map(d => ({ date: d._id, revenue: d.revenue }));
+
+    // Payment status breakdown
+    const paymentStatusAgg = await Order.aggregate([
+      { $group: { _id: "$payment_status", count: { $sum: 1 } } },
+    ]);
+    const paymentStatus = paymentStatusAgg.map(p => ({ status: p._id, count: p.count }));
+
+    // Daily new users last 7 days
+    const dailyUsersAgg = await UserModel.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id": 1 } },
+      { $limit: 7 },
+    ]);
+    const dailyUsers = dailyUsersAgg.map(u => ({ date: u._id, count: u.count }));
+
+    // Latest 5 orders
+    const latestOrdersRaw = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate("userId", "name")
+      .lean();
+
+    const latestOrders = latestOrdersRaw.map(order => ({
+      _id: order._id,
+      orderId: order.orderId,
+      userName: order.userId?.name || "Unknown",
+      totalAmt: order.totalAmt,
+      payment_status: order.payment_status,
+      delivery_status: order.delivery_status,
+    }));
+
+    res.json({
+      success: true,
       data: {
         totalUsers,
         totalOrders,
-        totalRevenue: totalRevenue[0]?.total || 0
+        totalRevenue,
+        dailyRevenue,
+        paymentStatus,
+        dailyUsers,
+        latestOrders,
       },
-      success: true
+      message: "Admin stats fetched successfully",
     });
   } catch (err) {
-    response.status(500).json({
-         message: "Error fetching stats", 
-         error: err.message 
-        });
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error fetching stats", error: err.message });
   }
 };
+
 
 //makerting message
 export const sendPromotionalEmail=async(request,response)=>{
