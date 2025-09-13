@@ -33,8 +33,7 @@ paymentRouter.delete("/:id", auth, deletePayment);
 paymentRouter.get("/admin/getall", auth, admin, getAllPayments);
 
 // Webhook route (no auth, raw body)
-paymentRouter.post("/webhook",
-  express.raw({ type: "application/json" }),  
+paymentRouter.post("/webhook", 
   handleStripeWebhook);
 
 export default paymentRouter;
