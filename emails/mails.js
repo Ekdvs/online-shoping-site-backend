@@ -101,30 +101,6 @@ export const couponEmailTemplate = (userName, coupon) => `
 </html>
 `;
 
-// Order status email
-export const orderStatusTemplate = (userName, order) => `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Order Update</title>
-</head>
-<body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f0f2f5;">
-  <div style="max-width:600px; margin:40px auto; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
-    ${generateEmailHeader()}
-    <div style="padding:30px 20px; text-align:center; color:#333;">
-      <p>Hello <strong>${userName}</strong>,</p>
-      <p>Your order <strong>${order._id}</strong> has been updated:</p>
-      <p><strong>Payment Status:</strong> ${order.payment_status}</p>
-      <p><strong>Delivery Status:</strong> ${order.delivery_status}</p>
-      <a href="${process.env.FRONTEND_URL}/orders/${order._id}" style="display:inline-block; margin-top:25px; padding:12px 25px; background-color:#007BFF; color:#fff; text-decoration:none; border-radius:50px; font-weight:bold;">View Order</a>
-    </div>
-    ${generateEmailFooter()}
-  </div>
-</body>
-</html>
-`;
 //payment suess full template
 export const paymentSuccessSimpleTemplate = (order, payment) => {
   const address = order.delivery_address;
@@ -190,6 +166,13 @@ export const paymentSuccessSimpleTemplate = (order, payment) => {
               style="color: #ffffff; background-color: #007BFF; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">
               View Receipt
            </a>
+        </p>
+
+        <p><strong>Order Details:</strong><br/>
+           <a href="${process.env.FRONTEND_URL}/ordershow/${order.orderId}" 
+            style="color: #ffffff; background-color: #007BFF; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Order Details
+          </a>
         </p>
 
         <p style="font-size: 16px; color: #555;">Thank you for shopping with us! If you have any questions, feel free to reply to this email.</p>
