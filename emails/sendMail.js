@@ -1,5 +1,5 @@
 import transporter from "../mailer.js";
-import { couponEmailTemplate, orderStatusTemplate, otpEmailTemplate, welcomeEmailTemplate } from "./mails.js";
+import { couponEmailTemplate, orderStatusTemplate, otpEmailTemplate, paymentSuccessSimpleTemplate, welcomeEmailTemplate } from "./mails.js";
 
 
 
@@ -73,3 +73,19 @@ export const sendOrderUpdate = async (email, username, order) => {
     console.error(`❌ Failed to send order email to ${email}:`, err);
   }
 };
+
+export const sendPaymentSuccess = async (order, payment) => {
+  try {
+    await transporter.sendMail({
+      from: `"Online Shopping" <${process.env.EMAIL_USER}>`,
+      to: order.userId.email,
+      subject: "Payment Successful - Order Details",
+      html: paymentSuccessSimpleTemplate(order, payment), // pass both
+    });
+    console.log("✅ Payment success email sent to:", order.userId.email);
+  } catch (err) {
+    console.error(`❌ Failed to send payment email to ${order.userId.email}:`, err);
+  }
+};
+
+
