@@ -1,6 +1,8 @@
 import Stripe from "stripe";
 import axios from "axios";
 import Payment from "../models/payment.modal.js";
+import Order from "../models/order.modal.js";
+import { sendPaymentSuccess } from "../emails/sendMail.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -72,18 +74,30 @@ export const getPaymentReceipt = async (request, response) => {
   try {
     const payment = await Payment.findOne({ stripePaymentIntentId: request.params.id });
     if (!payment) return response.status(404).json({ success: false, message: "Payment not found" });
+    // Fetch the order for email details
+    const order = await Order.findById(payment.orderId)
+      .populate("userId", "name email")
+      .populate("delivery_address");
+
+    // Send email only if user email exists
+    if (order?.userId?.email) {
+      await sendPaymentSuccess(order, payment);
+      //console.log("📧 Payment success email sent to:", order.userId.email);
+    }
+
     response.status(200).json({ 
       success: true, receipt_url: 
       payment.receipt_url, payment 
     });
+    
+
   } catch (err) {
+    onsole.error("Error in getPaymentReceipt:", err.message);
     response.status(500).json({ 
       success: false, message: "Internal Server Error", 
       error: err.message });
   }
 };
-
-//
 
 //Handle Stripe Webhook
 export const handleStripeWebhook = async (req, res) => {
@@ -110,9 +124,13 @@ export const handleStripeWebhook = async (req, res) => {
           { status: "succeeded", receipt_url: receiptUrl, raw: paymentIntent },
           { new: true }
         );
+        
+
         console.log("✅ PaymentIntent succeeded:", paymentIntent.id);
         break;
       }
+
+      
 
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object;

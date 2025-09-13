@@ -125,3 +125,81 @@ export const orderStatusTemplate = (userName, order) => `
 </body>
 </html>
 `;
+//payment suess full template
+export const paymentSuccessSimpleTemplate = (order, payment) => {
+  const address = order.delivery_address;
+
+  // Email header
+  const header = `
+    <div style="
+      background-color: #007BFF;
+      color: #fff;
+      text-align: center;
+      padding: 25px 20px;
+      font-size: 28px;
+      font-weight: bold;
+    ">
+      Online Shopping Center
+    </div>
+  `;
+
+  // Email footer
+  const footer = `
+    <div style="
+      background-color: #f0f2f5;
+      color: #888888;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+    ">
+      &copy; ${new Date().getFullYear()} Online Shopping Center. All rights reserved.<br/>
+      123 Your Street, Your City, Country
+    </div>
+  `;
+
+  // Main email content
+  const body = `
+    <div style="
+        font-family: Arial, sans-serif; 
+        color: #333; 
+        line-height: 1.6; 
+        background-color: #f7f7f7; 
+        padding: 30px 20px;
+      ">
+      
+      <div style="
+          max-width: 600px; 
+          margin: auto; 
+          background-color: #ffffff; 
+          padding: 20px; 
+          border-radius: 8px; 
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      ">
+        <h2 style="color: #007BFF; text-align: center;">Hello ${order.userId.name},</h2>
+        <p style="text-align: center; font-size: 16px;">We're thrilled to let you know that your payment has been successfully received!</p>
+
+        <h3 style="border-bottom: 2px solid #007BFF; padding-bottom: 5px;">Order Details</h3>
+        <p><strong>Order ID:</strong> ${order.orderId}</p>
+        <p><strong>Total Amount:</strong> LKR ${order.totalAmt}</p>
+        <p><strong>Delivery Address:</strong><br/>
+           ${address.address_line}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}
+        </p>
+
+        <p><strong>Payment Receipt:</strong><br/>
+           <a href="${payment.receipt_url}" target="_blank" rel="noopener noreferrer" 
+              style="color: #ffffff; background-color: #007BFF; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              View Receipt
+           </a>
+        </p>
+
+        <p style="font-size: 16px; color: #555;">Thank you for shopping with us! If you have any questions, feel free to reply to this email.</p>
+
+        <p style="font-size: 16px; color: #555; text-align: center;">Happy Shopping!<br/><strong>Your Online Shopping Team</strong></p>
+      </div>
+    </div>
+  `;
+
+  // Combine header, body, and footer
+  return `${header}${body}${footer}`;
+};
+
