@@ -183,33 +183,30 @@ export const deleteSubCategory = async (request, response) => {
 };
 
 // Get Subcategory by ID
-export const getSubCategoryById = async (request, response) => {
+export const getSubCategoryById = async (req, res) => {
   try {
-    //get subcategory id
     const { id } = req.params;
+    const subCategory = await SubCategory.findById(id).populate("categoryId", "name");
+    
+    if (!subCategory) {
+      return res.status(404).json({ success: false, message: "Subcategory not found" });
+    }
 
-    //find subcategory from data base
-    const subcategory = await SubCategory.findById(id).populate("categoryId", "name");
-    if (!subcategory) return response.status(404).json({
-       message: "Subcategory not found", 
-       success: false 
-      });
-    return response.status(200).json({
-      message: "Subcategory found",
-      data: subcategory,
+    return res.status(200).json({
       success: true,
-      error:false
+      data: subCategory,
     });
   } catch (error) {
-    return response.status(500).json({
-      message: error.message,
-      success: false
+    console.error("Error fetching subcategory:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch subcategory",
+      error: error.message,
     });
   }
 };
 
 // Get Subcategories by Category (id or name)
-
 export const getSubCategoriesByCategory = async (request, response) => {
   try {
     //get keyword

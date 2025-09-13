@@ -8,6 +8,7 @@ import {
   filterProducts,
   getAllProducts,
   getProductById,
+  getProductsBySubCategory,
   searchProduct,
   updateProduct,
 } from "../controllers/productController.js";
@@ -34,5 +35,8 @@ productRouter.get("/search", searchProduct);
 
 // Filter products
 productRouter.get("/filter", filterProducts);
+
+// Get products by subcategory
+productRouter.get("/get/:id", getProductsBySubCategory );
 
 export default productRouter;
