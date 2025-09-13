@@ -133,6 +133,8 @@ export const applyDiscount = async (request, response) => {
     });
     }
 
+    
+
     // Check Expiry
     if (coupon.expiryDate < new Date()) {
       return response.status(400).json({
@@ -140,6 +142,14 @@ export const applyDiscount = async (request, response) => {
          message: "Coupon expired" ,
          error:true,
         });
+    }
+    // Check if user already used this coupon
+    if (coupon.usersUsed?.includes(userId)) {
+      return response.status(400).json({
+        success: false,
+        message: "You have already used this coupon",
+        error: true,
+      });
     }
 
     // Get Cart Items

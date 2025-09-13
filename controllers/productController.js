@@ -1,5 +1,6 @@
 // controllers/productController.js
 import Product from "../models/product.model.js";
+import SubCategory from "../models/subCategory.js";
 import uploadImageCloudinary from "../util/uploadImageCloudinary.js";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -267,3 +268,38 @@ export const filterProducts = async (request, response) => {
     });
   }
 };
+
+//get all products for usin subcategory
+export const getProductsBySubCategory = async (req, res) => {
+  try {
+    const { id } = req.params; // subcategory ID
+
+    // Check if subcategory exists
+    const subCategory = await SubCategory.findById(id);
+    if (!subCategory) {
+      return res.status(404).json({
+        success: false,
+        message: "Subcategory not found",
+      });
+    }
+
+    // Find products under this subcategory
+    const products = await Product.find({ sub_categoryId: id })
+      .populate("sub_categoryId", "name")
+      .populate("categoryId", "name");
+
+    return res.status(200).json({
+      success: true,
+      data: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch products",
+      error: error.message,
+    });
+  }
+};
+
+
