@@ -65,45 +65,50 @@ export const createCardItem=async(request,response)=>{
 }
 
 //get current user cart
-export const getUserCart=async(request,response)=>{
-    try {
-        //get user id
-        const userId=request.userId
-        
-        //check user login and register
-        if(!userId){
-            return response.status(404).json({
-                message: "Please login",
-                error:true,
-                success:false
-            })
-        }
+export const getUserCart = async (req, res) => {
+  try {
+    const userId = req.userId;
 
-        const cart =await CartProduct.find({userId})
-        .populate("productId", "name price image stock");
-
-
-        if(!cart||cart.length===0){
-            return response.status(404).json({
-                message: "cart item is empty",
-                error:true,
-                success:false
-            })
-        }
-
-        return response.status(200).json({
-            message: "Cart retrieved successfully",
-            data: cart,
-            success: true,
-            error:false,
-        })
-    } 
-    catch (error) {
-        return response.status(500).json({ 
-            message: "Server error", 
-            error: error.message });
+    // If not logged in
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized. Please login",
+        success: false,
+        error: true,
+      });
     }
-}
+
+    // Fetch cart and populate product details
+    const cart = await CartProduct.find({ userId })
+      .populate("productId", "name price image stock");
+
+    // If empty cart, return success with empty array
+    if (!cart || cart.length === 0) {
+      return res.status(200).json({
+        message: "Cart is empty",
+        data: [],
+        success: true,
+        error: false,
+      });
+    }
+
+    // Return cart with items
+    return res.status(200).json({
+      message: "Cart retrieved successfully",
+      data: cart,
+      success: true,
+      error: false,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+      success: false,
+    });
+  }
+};
+
 
 //update cart item in quantity
 export const updateCartItem=async(request,response)=>{

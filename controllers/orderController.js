@@ -1,4 +1,7 @@
+import Notification from "../models/notification.model.js";
 import Order from "../models/order.modal.js";
+import UserModel from "../models/user.model.js";
+import { emitToAdmin, emitToUser } from "../services/soketService.js";
 
 
 // Create Order
@@ -41,6 +44,33 @@ export const createOrder = async (request, response) => {
       totalAmt,
     });
 
+    //create  notification in data base
+    const userNote=await Notification.create({
+      userId,
+      message:`Your order ${order.orderId} has been placed successfully`,
+      meta:{orderId:order.orderId},
+      role:'user'
+
+    })
+
+    // emit real-time event to the specific user (if connected)
+    emitToUser(userId, "notification", userNote);
+    
+    // Admin notifications
+    const admins = await UserModel.find({ role: "ADMIN" }, "_id name");
+    
+
+    for (let admin of admins) {
+      const adminNote = await Notification.create({
+      userId: admin._id,
+      message: `New order ${order.orderId} placed by ${request.userName || "a user"}`,
+      meta: { orderId: order.orderId, userId },
+      role: "admin",
+    });
+
+      emitToAdmin("newAdminNotification", adminNote);
+      
+    }
 
     return response.status(201).json({
       success: true,
@@ -94,6 +124,35 @@ export const updateOrderStatus = async (request, response) => {
         message: "Order not found",
         success: false,
       });
+    }
+
+    // build message
+    let noteMessage = `Your order ${updatedOrder.orderId} has been updated.`;
+    if (delivery_status) noteMessage = `Your order ${updatedOrder.orderId} is now ${delivery_status}`;
+    if (payment_status) noteMessage = `Your order ${updatedOrder.orderId} payment is ${payment_status}`;
+
+    // Notify the user
+    const userNote = await Notification.create({
+      userId,
+      message: noteMessage,
+      meta: { orderId: updatedOrder.orderId, delivery_status, payment_status },
+      role: "user",
+    });
+    emitToUser(userId, "notification", userNote);
+
+    // Notify admins about the update
+    const admins = await UserModel.find({ role: "ADMIN" }, "_id name");
+    
+
+    for (let admin of admins) {
+      const adminNote = await Notification.create({
+        userId: admin._id,
+        message: `Order ${updatedOrder.orderId} updated by admin`,
+        meta: { orderId: updatedOrder.orderId, delivery_status, payment_status, userId },
+        role: "admin",
+      });
+      emitToAdmin("newAdminNotification", adminNote);
+      
     }
 
     return response.status(200).json({
