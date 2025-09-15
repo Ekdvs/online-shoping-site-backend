@@ -156,6 +156,37 @@ export const handleStripeWebhook = async (req, res) => {
         break;
       }
 
+      // 🔹 Checkout Session events
+      case "checkout.session.completed": {
+        const session = event.data.object;
+        console.log("✅ Checkout completed:", session.id);
+
+        await Payment.findOneAndUpdate(
+          { stripePaymentIntentId: session.payment_intent },
+          { status: "succeeded", raw: session },
+          { new: true }
+        );
+        break;
+      }
+
+      case "checkout.session.async_payment_succeeded": {
+        const session = event.data.object;
+        console.log("✅ Async payment succeeded:", session.id);
+        break;
+      }
+
+      case "checkout.session.async_payment_failed": {
+        const session = event.data.object;
+        console.log("❌ Async payment failed:", session.id);
+        break;
+      }
+
+      case "checkout.session.expired": {
+        const session = event.data.object;
+        console.log("⌛ Checkout session expired:", session.id);
+        break;
+      }
+
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }
