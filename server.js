@@ -23,6 +23,13 @@ import { initSocket } from "./services/soketService.js";
 dotenv.config();
 const app = express();
 
+// ⚠️ Stripe webhook must come BEFORE express.json()
+app.post(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" }),
+  handleStripeWebhook
+);
+
 // Middleware
 app.use(cookieParser());
 app.use(
@@ -32,12 +39,7 @@ app.use(
   })
 );
 
-// ⚠️ Stripe webhook must come BEFORE express.json()
-app.use(
-  "/api/payments/webhook",
-  express.raw({ type: "application/json" }),
-  handleStripeWebhook
-);
+
 
 // JSON parser for all other routes
 app.use(express.json());
