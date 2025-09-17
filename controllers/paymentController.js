@@ -103,41 +103,51 @@ export const getPaymentReceipt = async (request, response) => {
 
 //Handle Stripe Webhook
 export const handleStripeWebhook = async (req, res) => {
+  let event;
+
   try {
     const sig = req.headers["stripe-signature"];
     if (!sig) return res.status(400).send("Missing stripe-signature header");
 
-    // Choose correct secret based on environment
+    // Choose correct webhook secret
     const webhookSecret =
       process.env.NODE_ENV === "production"
         ? process.env.STRIPE_WEBHOOK_SECRET
         : process.env.STRIPE_LOCAL_WEBHOOK_SECRET;
 
-    console.log("111111111111111",webhookSecret)
-    console.log("Raw body:", req.body.toString());
+    // Construct event from raw body
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err) {
+    console.error("⚠️ Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
 
-
-    const event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-
+  try {
     switch (event.type) {
+      // Payment Intent succeeded
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object;
-        const charge = paymentIntent.charges?.data?.[0];
-        const receiptUrl = charge?.receipt_url || "";
+
+        // Get receipt_url safely
+        let receiptUrl = "";
+        if (paymentIntent.charges?.data?.length > 0) {
+          receiptUrl = paymentIntent.charges.data[0].receipt_url || "";
+        } else {
+          // fallback: fetch the latest charge from Stripe
+          const charges = await stripe.charges.list({ payment_intent: paymentIntent.id, limit: 1 });
+          if (charges.data.length > 0) receiptUrl = charges.data[0].receipt_url || "";
+        }
 
         await Payment.findOneAndUpdate(
           { stripePaymentIntentId: paymentIntent.id },
           { status: "succeeded", receipt_url: receiptUrl, raw: paymentIntent },
           { new: true }
         );
-        
-
         console.log("✅ PaymentIntent succeeded:", paymentIntent.id);
         break;
       }
 
-      
-
+      // Payment failed
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object;
         await Payment.findOneAndUpdate(
@@ -149,6 +159,7 @@ export const handleStripeWebhook = async (req, res) => {
         break;
       }
 
+      // Charge succeeded (always has receipt_url)
       case "charge.succeeded": {
         const charge = event.data.object;
         await Payment.findOneAndUpdate(
@@ -160,31 +171,33 @@ export const handleStripeWebhook = async (req, res) => {
         break;
       }
 
-      // 🔹 Checkout Session events
+      // Checkout session completed
       case "checkout.session.completed": {
         const session = event.data.object;
-        console.log("✅ Checkout completed:", session.id);
-
         await Payment.findOneAndUpdate(
           { stripePaymentIntentId: session.payment_intent },
           { status: "succeeded", raw: session },
           { new: true }
         );
+        console.log("✅ Checkout session completed:", session.id);
         break;
       }
 
+      // Async payment succeeded
       case "checkout.session.async_payment_succeeded": {
         const session = event.data.object;
         console.log("✅ Async payment succeeded:", session.id);
         break;
       }
 
+      // Async payment failed
       case "checkout.session.async_payment_failed": {
         const session = event.data.object;
         console.log("❌ Async payment failed:", session.id);
         break;
       }
 
+      // Checkout session expired
       case "checkout.session.expired": {
         const session = event.data.object;
         console.log("⌛ Checkout session expired:", session.id);
@@ -192,15 +205,16 @@ export const handleStripeWebhook = async (req, res) => {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`⚠️ Unhandled event type: ${event.type}`);
     }
 
     res.status(200).json({ received: true });
   } catch (err) {
-    console.error("Webhook Error:", err.message);
-    res.status(400).send(`Webhook Error: ${err.message}`);
+    console.error("Webhook processing error:", err.message);
+    res.status(500).send(`Webhook processing error: ${err.message}`);
   }
 };
+
 // Get All Payments for a User
 export const getUserPayments = async (request, response) => {
   try {
