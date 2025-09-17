@@ -8,6 +8,10 @@ const addressSchema=new mongoose.Schema(
             required: true,
             unique:true
         },
+        name:{
+            type:String,
+            
+        },
         address_line:{
             type:String,
             default:'',
