@@ -114,6 +114,8 @@ export const handleStripeWebhook = async (req, res) => {
         : process.env.STRIPE_LOCAL_WEBHOOK_SECRET;
 
     console.log("111111111111111",webhookSecret)
+    console.log("Raw body:", req.body.toString());
+
 
     const event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
 
@@ -286,5 +288,6 @@ export const getAllPayments = async (request, response) => {
     });
   }
 };
+
 
 
