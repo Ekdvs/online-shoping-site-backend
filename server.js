@@ -34,7 +34,7 @@ app.post(
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", process.env.FRONTEND_URL],
+    origin: ["http://localhost:5173", process.env.FRONTEND_URL,process.env.PREVIEW_URL],
     credentials: true,
   })
 );
@@ -105,3 +105,4 @@ connectDB().then(() => {
   );
 
 });
+
