@@ -34,7 +34,7 @@ app.post(
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://online-shopping-site-frontend.vercel.app"],
+    origin: ["http://localhost:5173", process.env.FRONTEND_URL],
     credentials: true,
   })
 );
@@ -103,4 +103,5 @@ connectDB().then(() => {
   httpServer.listen(process.env.PORT || 5000, () =>
     console.log("🚀 Server running on port", process.env.PORT || 5000)
   );
+
 });
