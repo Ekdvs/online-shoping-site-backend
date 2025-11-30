@@ -152,7 +152,7 @@ export const loginUsers =async(requset,response)=>{
 
     }
     catch(error){
-      //console.log(error)
+      console.log(error)
         return response.status(500).json({
                 message:error.message,
                 error:true,
@@ -740,4 +740,5 @@ export const getUserData = async (requset, response)=>{
           error:true,
           message: error.message });
     }
+
 }
