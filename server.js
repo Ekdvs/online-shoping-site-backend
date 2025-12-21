@@ -68,7 +68,7 @@ const httpServer = http.createServer(app);
 
 const io = new IOServer(httpServer, {
   cors: {
-    origin: ["http://localhost:5173", "https://online-shopping-site-frontend.vercel.app"],
+    origin: ["http://localhost:5173", "https://online-shopping-frontend-zeta.vercel.app","https://online-shopping-frontend-ekdvs-vishwa-sampaths-projects.vercel.app"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
 });
@@ -105,4 +105,5 @@ connectDB().then(() => {
   );
 
 });
+
 
