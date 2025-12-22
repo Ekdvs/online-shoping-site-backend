@@ -6,6 +6,7 @@ import generatedOtp from "../util/genarateOtp.js";
 import uploadImageCloudinary from "../util/uploadImageCloudinary.js";
 import generateRefreshToken from "../util/generatedRefreshToken.js";
 import generatedAccesToken from "../util/generatedAccessToken.js";
+import axios from "axios";
 
 
 
@@ -119,8 +120,8 @@ export const loginUsers =async(requset,response)=>{
             });
         }
         // acess and refesh token
-        const accessToken =await generatedAccesToken(user._id);
-        const refeshToken =await generateRefreshToken(user._id);
+        const accessToken =await generatedAccesToken(user);
+        const refeshToken =await generateRefreshToken(user);
 
          // Update last login
         const updateUser=await UserModel.findByIdAndUpdate(user._id,{
@@ -785,25 +786,27 @@ export const googleLogin = async (req, res) => {
         email,
         avatar: picture,
         password: "GoogleOAuth", 
-        provider: "google"
+        provider: "google",
+        role:"USER"
       });
     }
 
     // 4️⃣ Generate tokens
     const accessToken = generatedAccesToken(user);
-    const refreshToken = generatedRefreshToken(user._id);
-    console.log("Generated Tokens:", { accessToken });
+    const refeshToken = generateRefreshToken(user._id);
+    // console.log("Generated Tokens:", { accessToken });
 
-    // 5️⃣ Store refresh token in cookie
-    res.cookie("accessToken", accessToken, {
-      ...cookieOptions,
-      maxAge: 15 * 60 * 1000
-    });
+   //add cookies
+        const cookieOptions={
+            httpOnly:true,
+            secure:true,
+            sameSite:'None',
 
-    res.cookie("refreshToken", refreshToken, {
-      ...cookieOptions,
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+        }
+         
+        //add to token to cokies
+        res.cookie("accessToken",accessToken,cookieOptions);
+        res.cookie("refeshToken",refeshToken,cookieOptions);
 
     return res.status(200).json({
       message: "Google Login Successful",
@@ -811,7 +814,7 @@ export const googleLogin = async (req, res) => {
       data: {
         updateUser: user,
         accessToken,
-        refreshToken
+        refeshToken
       }
     });
 
